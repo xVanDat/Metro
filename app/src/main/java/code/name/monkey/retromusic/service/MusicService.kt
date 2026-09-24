@@ -86,6 +86,7 @@ import code.name.monkey.retromusic.util.PreferenceUtil.playbackPitch
 import code.name.monkey.retromusic.util.PreferenceUtil.playbackSpeed
 import code.name.monkey.retromusic.util.PreferenceUtil.registerOnSharedPreferenceChangedListener
 import code.name.monkey.retromusic.util.PreferenceUtil.unregisterOnSharedPreferenceChangedListener
+import code.name.monkey.retromusic.util.ReplayGainUtil
 import code.name.monkey.retromusic.volume.AudioVolumeObserver
 import code.name.monkey.retromusic.volume.OnAudioVolumeChangedListener
 import com.bumptech.glide.Glide
@@ -652,6 +653,11 @@ class MusicService : MediaBrowserServiceCompat(),
                 }
             }
 
+            REPLAY_GAIN_MODE -> serviceScope.launch(Default) {
+                val next = runCatching { getSongAt(getNextPosition(false)) }.getOrDefault(emptySong)
+                updateReplayGain(next)
+            }
+
             ALBUM_ART_ON_LOCK_SCREEN, BLURRED_ALBUM_ART -> updateMediaSessionMetaData(::updateMediaSessionPlaybackState)
             COLORED_NOTIFICATION -> {
                 playingNotification?.updateMetadata(currentSong) {
@@ -840,6 +846,7 @@ class MusicService : MediaBrowserServiceCompat(),
     fun prepareNextImpl() {
         try {
             val nextPosition = getNextPosition(false)
+            updateReplayGain(getSongAt(nextPosition))
             playbackManager.setNextDataSource(getSongAt(nextPosition).uri.toString())
             this.nextPosition = nextPosition
         } catch (ignored: Exception) {
@@ -1210,6 +1217,7 @@ class MusicService : MediaBrowserServiceCompat(),
             trackEndedByCrossfade = false
             false
         }
+        updateReplayGain(getSongAt(getNextPosition(false)))
         playbackManager.setDataSource(currentSong, force) { success ->
             if (success && force) {
                 PlaybackPositionStore.resumePosition(this, currentSong)
@@ -1218,6 +1226,13 @@ class MusicService : MediaBrowserServiceCompat(),
             }
             completion(success)
         }
+    }
+
+    private fun updateReplayGain(nextSong: Song) {
+        playbackManager.setReplayGain(
+            ReplayGainUtil.multiplier(currentSong),
+            ReplayGainUtil.multiplier(nextSong)
+        )
     }
 
     private fun saveCurrentResumePosition() {

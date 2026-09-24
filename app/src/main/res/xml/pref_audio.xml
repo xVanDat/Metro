@@ -40,6 +40,17 @@
         android:summary="@string/pref_summary_resume_long_tracks"
         android:title="@string/pref_title_resume_long_tracks" />
 
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEListPreference
+        android:defaultValue="off"
+        android:entries="@array/pref_replay_gain_entries"
+        android:entryValues="@array/pref_replay_gain_values"
+        android:key="replay_gain_mode"
+        android:layout="@layout/list_item_view"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_summary_replay_gain"
+        android:title="@string/pref_title_replay_gain" />
+
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreference
         android:key="equalizer"
         android:layout="@layout/list_item_view_no_title"

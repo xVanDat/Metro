@@ -31,6 +31,9 @@ import code.name.monkey.retromusic.util.logE
 class MultiPlayer(context: Context) : LocalPlayback(context) {
     private var mCurrentMediaPlayer = MediaPlayer()
     private var mNextMediaPlayer: MediaPlayer? = null
+    private var requestedVolume = 1f
+    private var replayGainMultiplier = 1f
+    private var nextReplayGainMultiplier = 1f
     override var callbacks: PlaybackCallbacks? = null
 
     /**
@@ -56,6 +59,7 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
         setDataSourceImpl(mCurrentMediaPlayer, song.uri.toString()) { success ->
             isInitialized = success
             if (isInitialized) {
+                applyCurrentVolume()
                 setNextDataSource(null)
             }
             completion(isInitialized)
@@ -89,6 +93,7 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
             mNextMediaPlayer?.audioSessionId = audioSessionId
             setDataSourceImpl(mNextMediaPlayer!!, path) { success ->
                 if (success) {
+                    applyNextVolume()
                     try {
                         mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer)
                     } catch (e: IllegalArgumentException) {
@@ -210,12 +215,30 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
     }
 
     override fun setVolume(vol: Float): Boolean {
+        requestedVolume = vol
         return try {
-            mCurrentMediaPlayer.setVolume(vol, vol)
+            applyCurrentVolume()
             true
         } catch (e: IllegalStateException) {
             false
         }
+    }
+
+    override fun setReplayGain(currentMultiplier: Float, nextMultiplier: Float) {
+        replayGainMultiplier = currentMultiplier.coerceIn(0f, 1f)
+        nextReplayGainMultiplier = nextMultiplier.coerceIn(0f, 1f)
+        runCatching { applyCurrentVolume() }
+        runCatching { applyNextVolume() }
+    }
+
+    private fun applyCurrentVolume() {
+        val volume = (requestedVolume * replayGainMultiplier).coerceIn(0f, 1f)
+        mCurrentMediaPlayer.setVolume(volume, volume)
+    }
+
+    private fun applyNextVolume() {
+        val volume = (requestedVolume * nextReplayGainMultiplier).coerceIn(0f, 1f)
+        mNextMediaPlayer?.setVolume(volume, volume)
     }
 
     /**
@@ -257,6 +280,8 @@ class MultiPlayer(context: Context) : LocalPlayback(context) {
             isInitialized = false
             mCurrentMediaPlayer.release()
             mCurrentMediaPlayer = mNextMediaPlayer!!
+            replayGainMultiplier = nextReplayGainMultiplier
+            applyCurrentVolume()
             isInitialized = true
             mNextMediaPlayer = null
             callbacks?.onTrackWentToNext()

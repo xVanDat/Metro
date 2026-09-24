@@ -92,6 +92,10 @@ class PlaybackManager(val context: Context) {
         playback?.setNextDataSource(trackUri)
     }
 
+    fun setReplayGain(currentMultiplier: Float, nextMultiplier: Float) {
+        playback?.setReplayGain(currentMultiplier, nextMultiplier)
+    }
+
     fun setCrossFadeDuration(duration: Int) {
         playback?.setCrossFadeDuration(duration)
     }

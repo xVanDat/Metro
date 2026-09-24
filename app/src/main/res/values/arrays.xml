@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <array name="pref_replay_gain_entries">
+        <item>@string/replay_gain_off</item>
+        <item>@string/replay_gain_track</item>
+        <item>@string/replay_gain_album</item>
+    </array>
+
+    <string-array name="pref_replay_gain_values">
+        <item>off</item>
+        <item>track</item>
+        <item>album</item>
+    </string-array>
+
     <array name="pref_album_cover_transform_entries">
         <item>@string/normal</item>
         <item>@string/cascading</item>

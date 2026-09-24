@@ -38,6 +38,9 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
     private var crossFadeAnimator: Animator? = null
     override var callbacks: PlaybackCallbacks? = null
     private var crossFadeDuration = PreferenceUtil.crossFadeDuration
+    private var requestedVolume = 1f
+    private var replayGainMultiplier = 1f
+    private var nextReplayGainMultiplier = 1f
     var isCrossFading = false
 
     init {
@@ -109,13 +112,25 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
 
     override fun setVolume(vol: Float): Boolean {
         cancelFade()
+        requestedVolume = vol
         return try {
-            getCurrentPlayer()?.setVolume(vol, vol)
+            applyCurrentVolume()
             true
         } catch (e: IllegalStateException) {
             e.printStackTrace()
             false
         }
+    }
+
+    override fun setReplayGain(currentMultiplier: Float, nextMultiplier: Float) {
+        replayGainMultiplier = currentMultiplier.coerceIn(0f, 1f)
+        nextReplayGainMultiplier = nextMultiplier.coerceIn(0f, 1f)
+        runCatching { applyCurrentVolume() }
+    }
+
+    private fun applyCurrentVolume() {
+        val volume = (requestedVolume * replayGainMultiplier).coerceIn(0f, 1f)
+        getCurrentPlayer()?.setVolume(volume, volume)
     }
 
     override val isInitialized: Boolean
@@ -136,6 +151,7 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
             getCurrentPlayer()?.let {
                 setDataSourceImpl(it, song.uri.toString()) { success ->
                     mIsInitialized = success
+                    if (success) applyCurrentVolume()
                     completion(success)
                 }
             }
@@ -236,7 +252,13 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
 
     private fun crossFade(fadeInMp: MediaPlayer, fadeOutMp: MediaPlayer) {
         isCrossFading = true
-        crossFadeAnimator = createFadeAnimator(context, fadeInMp, fadeOutMp) {
+        crossFadeAnimator = createFadeAnimator(
+            context,
+            fadeInMp,
+            fadeOutMp,
+            nextReplayGainMultiplier * requestedVolume,
+            replayGainMultiplier * requestedVolume
+        ) {
             crossFadeAnimator = null
             durationListener.start()
             isCrossFading = false
@@ -335,6 +357,7 @@ class CrossFadePlayer(context: Context) : LocalPlayback(context) {
             } else {
                 CurrentPlayer.PLAYER_ONE
             }
+        replayGainMultiplier = nextReplayGainMultiplier
         callbacks?.onTrackEndedWithCrossfade()
     }
 

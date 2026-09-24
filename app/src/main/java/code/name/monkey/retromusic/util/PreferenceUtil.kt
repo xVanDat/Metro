@@ -318,6 +318,9 @@ object PreferenceUtil {
     val isResumeLongTracks
         get() = sharedPreferences.getBoolean(RESUME_LONG_TRACKS, true)
 
+    val replayGainMode
+        get() = sharedPreferences.getStringOrDefault(REPLAY_GAIN_MODE, ReplayGainUtil.MODE_OFF)
+
     val isAdaptiveColor
         get() = sharedPreferences.getBoolean(
             ADAPTIVE_COLOR_APP, false

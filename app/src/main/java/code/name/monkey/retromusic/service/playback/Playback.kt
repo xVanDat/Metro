@@ -49,6 +49,8 @@ interface Playback {
 
     fun setVolume(vol: Float): Boolean
 
+    fun setReplayGain(currentMultiplier: Float, nextMultiplier: Float)
+
     fun setAudioSessionId(sessionId: Int): Boolean
 
     fun setCrossFadeDuration(duration: Int)
