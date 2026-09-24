@@ -203,8 +203,8 @@
     <string name="free">Free</string>
     <string name="full">Full</string>
     <string name="full_card">Full card</string>
-    <string name="general_settings_summary">Change the theme and colors of the app</string>
-    <string name="general_settings_title">Look and feel</string>
+    <string name="general_settings_summary">Theme, colors and custom font</string>
+    <string name="general_settings_title">Appearance and colors</string>
     <string name="genre">Genre</string>
     <string name="genres">Genres</string>
     <string name="git_hub_summary">Fork the project on GitHub</string>
@@ -300,7 +300,7 @@
     <string name="now_playing_summary">Customize the now playing screen</string>
     <string name="now_playing_themes">9+ now playing themes</string>
     <string name="only_on_wifi">Only on Wi-Fi</string>
-    <string name="other_settings_summary">Advanced testing features</string>
+    <string name="other_settings_summary">Library, blacklist, language and advanced options</string>
     <string name="others">Other</string>
     <string name="over_cover">Over Cover</string>
     <string name="password">Password</string>
@@ -404,7 +404,7 @@
     <string name="pref_title_colored_app">Adaptive color</string>
     <string name="pref_title_colored_notification">Colored notification</string>
     <string name="pref_title_cross_fade">Crossfade (Beta)</string>
-    <string name="pref_title_custom_font">Use Manrope font</string>
+    <string name="pref_title_custom_font">Custom font</string>
     <string name="pref_title_desaturated_color">Desaturated color</string>
     <string name="pref_title_expand_now_playing_panel">Show now playing screen</string>
     <string name="pref_title_extra_controls">Extra controls</string>
@@ -582,4 +582,16 @@
     <string name="you_will_be_forwarded_to_the_issue_tracker_website">You will be forwarded to the issue tracker website.</string>
     <string name="your_account_data_is_only_used_for_authentication">Your account data is only used for authentication.</string>
     <string name="could_not_write_tags_to_file">Could not write tags to the music file!</string>
+    <string name="animated_gradient">Animated gradient</string>
+    <string name="custom_font_picker_summary">Choose a TTF or OTF file with Android Files</string>
+    <string name="custom_font_selected">Selected: %1$s</string>
+    <string name="custom_font_manrope_active">Manrope is active. Choose a file to replace it.</string>
+    <string name="custom_font_applied">Applied %1$s</string>
+    <string name="custom_font_invalid">This file is not a valid or supported font</string>
+    <string name="custom_font_reset">Restore default font</string>
+    <string name="custom_font_reset_summary">Remove the selected font and use the system font</string>
+    <string name="settings_group_appearance">Appearance</string>
+    <string name="settings_group_playback">Playback</string>
+    <string name="settings_group_library_data">Library and data</string>
+    <string name="settings_group_information">Information</string>
 </resources>

@@ -14,7 +14,10 @@
 package code.name.monkey.retromusic.fragments.settings
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.TwoStatePreference
@@ -30,6 +33,7 @@ import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
 import code.name.monkey.retromusic.extensions.materialDialog
 import code.name.monkey.retromusic.fragments.NowPlayingScreen.*
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.CustomFontManager
 import com.afollestad.materialdialogs.color.colorChooser
 import com.google.android.material.color.DynamicColors
 
@@ -38,6 +42,23 @@ import com.google.android.material.color.DynamicColors
  */
 
 class ThemeSettingsFragment : AbsSettingsFragment() {
+    private val fontPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@registerForActivityResult
+        try {
+            runCatching {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                )
+            }
+            val name = CustomFontManager.install(requireContext(), uri)
+            Toast.makeText(requireContext(), getString(R.string.custom_font_applied, name), Toast.LENGTH_SHORT).show()
+            restartActivity()
+        } catch (_: Exception) {
+            Toast.makeText(requireContext(), R.string.custom_font_invalid, Toast.LENGTH_LONG).show()
+        }
+    }
+
     @SuppressLint("CheckResult")
     override fun invalidateSettings() {
         val generalTheme: Preference? = findPreference(GENERAL_THEME)
@@ -121,8 +142,32 @@ class ThemeSettingsFragment : AbsSettingsFragment() {
             restartActivity()
             true
         }
-        val customFont: ATESwitchPreference? = findPreference(CUSTOM_FONT)
-        customFont?.setOnPreferenceChangeListener { _, _ ->
+        val chooseFont: Preference? = findPreference(CHOOSE_CUSTOM_FONT)
+        chooseFont?.summary = when {
+            CustomFontManager.hasCustomFont(requireContext()) ->
+                getString(
+                    R.string.custom_font_selected,
+                    PreferenceUtil.customFontName.ifBlank { getString(R.string.pref_title_custom_font) },
+                )
+            PreferenceUtil.isCustomFont -> getString(R.string.custom_font_manrope_active)
+            else -> getString(R.string.custom_font_picker_summary)
+        }
+        chooseFont?.setOnPreferenceClickListener {
+            fontPicker.launch(
+                arrayOf(
+                    "font/*",
+                    "application/font-sfnt",
+                    "application/x-font-ttf",
+                    "application/x-font-opentype",
+                    "application/octet-stream",
+                )
+            )
+            true
+        }
+        val resetFont: Preference? = findPreference(RESET_CUSTOM_FONT)
+        resetFont?.isVisible = PreferenceUtil.isCustomFont || CustomFontManager.hasCustomFont(requireContext())
+        resetFont?.setOnPreferenceClickListener {
+            CustomFontManager.reset(requireContext())
             restartActivity()
             true
         }

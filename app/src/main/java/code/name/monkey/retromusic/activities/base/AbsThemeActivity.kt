@@ -27,18 +27,22 @@ import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.*
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.CustomFontManager
+import code.name.monkey.retromusic.util.FontApplier
 import code.name.monkey.retromusic.util.theme.getNightMode
 import code.name.monkey.retromusic.util.theme.getThemeResValue
 
 abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
 
     private val handler = Handler(Looper.getMainLooper())
+    private var fontApplier: FontApplier? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         updateLocale()
         updateTheme()
         hideStatusBar()
         super.onCreate(savedInstanceState)
+        fontApplier = CustomFontManager.attach(window.decorView)
         setEdgeToEdgeOrImmersive()
         maybeSetScreenOn()
         setLightNavigationBarAuto()
@@ -54,7 +58,7 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
             setDefaultNightMode(getNightMode())
         }
 
-        if (PreferenceUtil.isCustomFont) {
+        if (PreferenceUtil.isCustomFont && !CustomFontManager.hasCustomFont(this)) {
             setTheme(R.style.FontThemeOverlay)
         }
     }
@@ -88,6 +92,8 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
     }
 
     public override fun onDestroy() {
+        fontApplier?.stop()
+        fontApplier = null
         super.onDestroy()
         exitFullscreen()
     }

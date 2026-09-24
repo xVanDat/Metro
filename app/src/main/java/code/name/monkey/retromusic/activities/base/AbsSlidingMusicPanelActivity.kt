@@ -69,6 +69,7 @@ import code.name.monkey.retromusic.fragments.player.full.FullPlayerFragment
 import code.name.monkey.retromusic.fragments.player.gradient.GradientPlayerFragment
 import code.name.monkey.retromusic.fragments.player.material.MaterialFragment
 import code.name.monkey.retromusic.fragments.player.md3.MD3PlayerFragment
+import code.name.monkey.retromusic.fragments.player.normal.AnimatedGradientPlayerFragment
 import code.name.monkey.retromusic.fragments.player.normal.PlayerFragment
 import code.name.monkey.retromusic.fragments.player.peek.PeekPlayerFragment
 import code.name.monkey.retromusic.fragments.player.plain.PlainPlayerFragment
@@ -412,6 +413,12 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
                 navigationBarColor = paletteColor
                 setLightNavigationBar(isColorLight)
                 setLightStatusBar(isColorLight)
+            } else if (nowPlayingScreen == AnimatedGradient) {
+                animateNavigationBarColor(paletteColor)
+                navigationBarColor = paletteColor
+                val lightGradient = surfaceColor().isColorLight
+                setLightNavigationBar(isColorLight)
+                setLightStatusBar(lightGradient)
             } else if (nowPlayingScreen == Full) {
                 animateNavigationBarColor(paletteColor)
                 navigationBarColor = paletteColor
@@ -553,6 +560,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
             Blur -> BlurPlayerFragment()
             Adaptive -> AdaptiveFragment()
             Normal -> PlayerFragment()
+            AnimatedGradient -> AnimatedGradientPlayerFragment()
             Card -> CardFragment()
             BlurCard -> CardBlurFragment()
             Fit -> FitFragment()

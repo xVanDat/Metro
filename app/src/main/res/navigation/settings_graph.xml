@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/mainSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.MainSettingsFragment"
-        android:label="Settings"
+        android:label="@string/action_settings"
         tools:layout="@layout/fragment_main_settings">
 
         <action
@@ -88,46 +88,46 @@
     <fragment
         android:id="@+id/audioSettings"
         android:name="code.name.monkey.retromusic.fragments.settings.AudioSettings"
-        android:label="Audio" />
+        android:label="@string/pref_header_audio" />
 
     <fragment
         android:id="@+id/imageSettingFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.ImageSettingFragment"
-        android:label="Image" />
+        android:label="@string/pref_header_images" />
 
     <fragment
         android:id="@+id/notificationSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.NotificationSettingsFragment"
-        android:label="Notification" />
+        android:label="@string/notification" />
 
     <fragment
         android:id="@+id/nowPlayingSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.NowPlayingSettingsFragment"
-        android:label="Now Playing" />
+        android:label="@string/now_playing" />
 
     <fragment
         android:id="@+id/otherSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.OtherSettingsFragment"
-        android:label="Other" />
+        android:label="@string/others" />
 
     <fragment
         android:id="@+id/personalizeSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.PersonalizeSettingsFragment"
-        android:label="Personalize" />
+        android:label="@string/personalize" />
 
     <fragment
         android:id="@+id/themeSettingsFragment"
         android:name="code.name.monkey.retromusic.fragments.settings.ThemeSettingsFragment"
-        android:label="Look &amp; Feel" />
+        android:label="@string/general_settings_title" />
 
     <fragment
         android:id="@+id/aboutActivity"
         android:name="code.name.monkey.retromusic.fragments.about.AboutFragment"
-        android:label="About" />
+        android:label="@string/action_about" />
 
     <fragment
         android:id="@+id/backup_fragment"
         android:name="code.name.monkey.retromusic.fragments.backup.BackupFragment"
-        android:label="About" />
+        android:label="@string/backup_restore_title" />
 
 </navigation>

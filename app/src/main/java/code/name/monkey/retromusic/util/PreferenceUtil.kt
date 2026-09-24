@@ -675,6 +675,10 @@ object PreferenceUtil {
     val isCustomFont
         get() = sharedPreferences.getBoolean(CUSTOM_FONT, false)
 
+    var customFontName: String
+        get() = sharedPreferences.getStringOrDefault(CUSTOM_FONT_NAME, "")
+        set(value) = sharedPreferences.edit { putString(CUSTOM_FONT_NAME, value) }
+
     val isSnowFalling
         get() = sharedPreferences.getBoolean(SNOWFALL, false)
 

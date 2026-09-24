@@ -29,6 +29,7 @@ import code.name.monkey.retromusic.SNOWFALL
 import code.name.monkey.retromusic.databinding.FragmentPlayerBinding
 import code.name.monkey.retromusic.extensions.*
 import code.name.monkey.retromusic.fragments.base.AbsPlayerFragment
+import code.name.monkey.retromusic.fragments.NowPlayingScreen
 import code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
@@ -37,7 +38,7 @@ import code.name.monkey.retromusic.util.ViewUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import code.name.monkey.retromusic.views.DrawableGradient
 
-class PlayerFragment : AbsPlayerFragment(R.layout.fragment_player),
+open class PlayerFragment : AbsPlayerFragment(R.layout.fragment_player),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var lastColor: Int = 0
@@ -97,7 +98,12 @@ class PlayerFragment : AbsPlayerFragment(R.layout.fragment_player),
             requireActivity()
         )
 
-        if (PreferenceUtil.isAdaptiveColor) {
+        if (PreferenceUtil.nowPlayingScreen == NowPlayingScreen.AnimatedGradient) {
+            binding.colorGradientBackground.setAlbumColors(
+                color.backgroundColor,
+                color.actionBarColor,
+            )
+        } else if (PreferenceUtil.isAdaptiveColor) {
             colorize(color.backgroundColor)
         }
     }

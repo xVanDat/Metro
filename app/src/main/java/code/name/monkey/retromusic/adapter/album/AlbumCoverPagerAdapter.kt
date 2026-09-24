@@ -125,7 +125,7 @@ class AlbumCoverPagerAdapter(
                         com.google.android.material.R.style.ThemeOverlay_MaterialComponents_Dialog_Alert
                     ).apply {
                         setTitle(song.title)
-                        setMessage(if (data.isNullOrEmpty()) "No lyrics found" else data)
+                        setMessage(if (data.isNullOrEmpty()) getString(R.string.no_lyrics_found) else data)
                         setNegativeButton(R.string.synced_lyrics) { _, _ ->
                             goToLyrics(requireActivity())
                         }

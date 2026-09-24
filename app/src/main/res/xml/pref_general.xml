@@ -29,11 +29,19 @@
             android:title="@string/pref_title_md3"
             app:isPreferenceVisible="@bool/md3_available" />
 
-        <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
-            android:defaultValue="false"
-            android:key="custom_font"
-            android:layout="@layout/list_item_view_switch_no_title"
-            android:title="@string/pref_title_custom_font" />
+        <androidx.preference.Preference
+            android:key="choose_custom_font"
+            android:layout="@layout/list_item_view"
+            android:summary="@string/custom_font_picker_summary"
+            android:title="@string/pref_title_custom_font"
+            app:icon="@drawable/ic_font" />
+
+        <androidx.preference.Preference
+            android:key="reset_custom_font"
+            android:layout="@layout/list_item_view"
+            android:summary="@string/custom_font_reset_summary"
+            android:title="@string/custom_font_reset"
+            app:icon="@drawable/ic_restore" />
 
     </code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreferenceCategory>
 
