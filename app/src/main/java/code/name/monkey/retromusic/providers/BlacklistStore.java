@@ -86,27 +86,47 @@ public class BlacklistStore extends SQLiteOpenHelper {
     onCreate(db);
   }
 
-  public void addPath(File file) {
-    addPathImpl(file);
-    notifyMediaStoreChanged();
+  public boolean addPath(File file) {
+    boolean added = addPathImpl(file);
+    if (added) {
+      notifyMediaStoreChanged();
+    }
+    return added;
   }
 
-  private void addPathImpl(File file) {
-    if (file == null || contains(file)) {
-      return;
+  private boolean addPathImpl(File file) {
+    if (file == null) {
+      return false;
     }
     String path = FileUtil.safeGetCanonicalPath(file);
+
+    for (String existingPath : getPaths()) {
+      if (path.equals(existingPath) || path.startsWith(existingPath + File.separator)) {
+        return false;
+      }
+    }
 
     final SQLiteDatabase database = getWritableDatabase();
     database.beginTransaction();
 
     try {
+      // A parent folder supersedes any of its previously blacklisted children.
+      for (String existingPath : getPaths()) {
+        if (existingPath.startsWith(path + File.separator)) {
+          database.delete(
+              BlacklistStoreColumns.NAME,
+              BlacklistStoreColumns.PATH + "=?",
+              new String[] {existingPath});
+        }
+      }
+
       // add the entry
       final ContentValues values = new ContentValues(1);
       values.put(BlacklistStoreColumns.PATH, path);
       database.insert(BlacklistStoreColumns.NAME, null, values);
 
       database.setTransactionSuccessful();
+      return true;
     } finally {
       database.endTransaction();
     }

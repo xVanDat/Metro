@@ -89,6 +89,9 @@
     <string name="biography">Tiểu sử</string>
     <string name="black_theme_name">Đen hoàn toàn</string>
     <string name="blacklist">Danh sách đen</string>
+    <string name="blacklist_folder_added">Đã thêm thư mục vào danh sách đen</string>
+    <string name="blacklist_folder_already_added">Thư mục này đã nằm trong phạm vi của danh sách đen</string>
+    <string name="blacklist_folder_not_supported">Hãy chọn thư mục trên bộ nhớ trong hoặc thẻ SD</string>
     <string name="bluetooth_summary">Ứng dụng cần quyền các thiết bị lân cận để kiểm tra các thiết bị bluetooth</string>
     <string name="bluetooth_title">Thiết bị lân cận</string>
     <string name="blur">Làm mờ</string>
