@@ -204,6 +204,11 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
                 return true
             }
 
+            R.id.action_bookmarks -> {
+                BookmarksDialog().show(parentFragmentManager, "BOOKMARKS")
+                return true
+            }
+
             R.id.action_set_as_ringtone -> {
                 requireContext().run {
                     if (RingtoneManager.requiresDialog(this)) {

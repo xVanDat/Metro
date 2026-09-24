@@ -93,6 +93,12 @@
     <string name="blacklist_folder_added">Đã thêm thư mục vào danh sách đen</string>
     <string name="blacklist_folder_already_added">Thư mục này đã nằm trong phạm vi của danh sách đen</string>
     <string name="blacklist_folder_not_supported">Hãy chọn thư mục trên bộ nhớ trong hoặc thẻ SD</string>
+    <string name="bookmarks">Dấu trang</string>
+    <string name="add_bookmark">Đánh dấu vị trí hiện tại</string>
+    <string name="bookmark_added">Đã thêm dấu trang</string>
+    <string name="bookmark_not_added">Hãy phát bài hát trước khi thêm dấu trang</string>
+    <string name="clear_bookmarks">Xóa các dấu trang</string>
+    <string name="no_bookmarks">Bài này chưa có dấu trang.</string>
     <string name="bluetooth_summary">Ứng dụng cần quyền các thiết bị lân cận để kiểm tra các thiết bị bluetooth</string>
     <string name="bluetooth_title">Thiết bị lân cận</string>
     <string name="blur">Làm mờ</string>
@@ -356,6 +362,7 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="pref_summary_extra_controls">Thêm điều khiển bổ sung cho trình phát mini</string>
     <string name="pref_summary_extra_song_info">Hiển thị thêm thông tin Bài hát, như là định dạng, tốc độ bit và tần số</string>
     <string name="pref_summary_gapless_playback">"Có thể gây ra vấn đề phát lại trên một số thiết bị."</string>
+    <string name="pref_summary_resume_long_tracks">Ghi nhớ vị trí riêng cho các bài dài hơn 10 phút.</string>
     <string name="pref_summary_home_banner">Hiện hoặc ẩn banner màn hình chính</string>
     <string name="pref_summary_ignore_media_store_artwork">Có thể tăng chất lượng hiển thị ảnh bìa album, nhưng sẽ làm thời gian tải hình ảnh chậm hơn. Chỉ bật tính năng này nếu bạn không thích chất lượng ảnh gốc</string>
     <string name="pref_summary_library_categories">Khả năng hiển thị và thứ tự của các danh mục trong thư viện.</string>
@@ -397,6 +404,7 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="pref_title_extra_controls">Điều khiển bổ sung</string>
     <string name="pref_title_extra_song_info">Thông tin bài hát</string>
     <string name="pref_title_gapless_playback">Phát không gián đoạn</string>
+    <string name="pref_title_resume_long_tracks">Tiếp tục bài dài</string>
     <string name="pref_title_general_theme">Chủ đề ứng dụng</string>
     <string name="pref_title_home_album_grid_style">Lưới Album</string>
     <string name="pref_title_home_artist_grid_style">Lưới nghệ sĩ trang chủ</string>

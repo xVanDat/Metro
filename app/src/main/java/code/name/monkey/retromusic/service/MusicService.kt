@@ -64,6 +64,7 @@ import code.name.monkey.retromusic.model.Song.Companion.emptySong
 import code.name.monkey.retromusic.model.smartplaylist.AbsSmartPlaylist
 import code.name.monkey.retromusic.providers.HistoryStore
 import code.name.monkey.retromusic.providers.MusicPlaybackQueueStore
+import code.name.monkey.retromusic.providers.PlaybackPositionStore
 import code.name.monkey.retromusic.providers.SongPlayCountStore
 import code.name.monkey.retromusic.service.notification.PlayingNotification
 import code.name.monkey.retromusic.service.notification.PlayingNotificationClassic
@@ -320,6 +321,7 @@ class MusicService : MediaBrowserServiceCompat(),
     }
 
     override fun onDestroy() {
+        saveCurrentResumePosition()
         unregisterReceiver(widgetIntentReceiver)
         unregisterReceiver(updateFavoriteReceiver)
         unregisterReceiver(lockScreenReceiver)
@@ -701,6 +703,7 @@ class MusicService : MediaBrowserServiceCompat(),
 
     override fun onTrackEnded() {
         acquireWakeLock()
+        PlaybackPositionStore.clearResumePosition(this, currentSong)
         // if there is a timer finished, don't continue
         if (pendingQuit
             || repeatMode == REPEAT_MODE_NONE && isLastTrack
@@ -723,6 +726,7 @@ class MusicService : MediaBrowserServiceCompat(),
     }
 
     override fun onTrackWentToNext() {
+        PlaybackPositionStore.clearResumePosition(this, currentSong)
         if (pendingQuit || repeatMode == REPEAT_MODE_NONE && isLastTrack) {
             playbackManager.setNextDataSource(null)
             pause(false)
@@ -733,6 +737,9 @@ class MusicService : MediaBrowserServiceCompat(),
             }
         } else {
             position = nextPosition
+            PlaybackPositionStore.resumePosition(this, currentSong)
+                .takeIf { it > 0 }
+                ?.let { seek(it) }
             prepareNextImpl()
             notifyChange(META_CHANGED)
         }
@@ -776,6 +783,7 @@ class MusicService : MediaBrowserServiceCompat(),
 
     @Synchronized
     fun openTrackAndPrepareNextAt(position: Int, completion: (success: Boolean) -> Unit) {
+        saveCurrentResumePosition()
         this.position = position
         openCurrent { success ->
             completion(success)
@@ -1102,6 +1110,7 @@ class MusicService : MediaBrowserServiceCompat(),
                 val isPlaying = isPlaying
                 if (!isPlaying && songProgressMillis > 0) {
                     savePositionInTrack()
+                    saveCurrentResumePosition()
                 }
                 songPlayCountHelper.notifyPlayStateChanged(isPlaying)
                 playingNotification?.setPlaying(isPlaying)
@@ -1202,7 +1211,18 @@ class MusicService : MediaBrowserServiceCompat(),
             false
         }
         playbackManager.setDataSource(currentSong, force) { success ->
+            if (success && force) {
+                PlaybackPositionStore.resumePosition(this, currentSong)
+                    .takeIf { it > 0 }
+                    ?.let { seek(it) }
+            }
             completion(success)
+        }
+    }
+
+    private fun saveCurrentResumePosition() {
+        if (currentSong.id >= 0 && songProgressMillis >= 0) {
+            PlaybackPositionStore.saveResumePosition(this, currentSong, songProgressMillis)
         }
     }
 

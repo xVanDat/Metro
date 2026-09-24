@@ -97,6 +97,12 @@
     <string name="blacklist_folder_added">Folder added to the blacklist</string>
     <string name="blacklist_folder_already_added">This folder is already covered by the blacklist</string>
     <string name="blacklist_folder_not_supported">Choose a folder from internal storage or an SD card</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="add_bookmark">Add current position</string>
+    <string name="bookmark_added">Bookmark added</string>
+    <string name="bookmark_not_added">Move playback before adding a bookmark</string>
+    <string name="clear_bookmarks">Clear bookmarks</string>
+    <string name="no_bookmarks">No bookmarks for this track yet.</string>
     <string name="bluetooth_summary">The app needs nearby devices permission to check for bluetooth devices</string>
     <string name="bluetooth_title">Nearby devices</string>
     <string name="blur">Blur</string>
@@ -361,6 +367,7 @@
     <string name="pref_summary_extra_controls">Add extra controls for mini player</string>
     <string name="pref_summary_extra_song_info">Show extra Song information, such as file format, bitrate and frequency</string>
     <string name="pref_summary_gapless_playback">"Can cause playback issues on some devices."</string>
+    <string name="pref_summary_resume_long_tracks">Remember a separate position for tracks longer than 10 minutes.</string>
     <string name="pref_summary_home_banner">Show or hide the home banner</string>
     <string name="pref_summary_ignore_media_store_artwork">Can increase the album cover quality, but causes slower image loading times. Only enable this if you have problems with low resolution artworks</string>
     <string name="pref_summary_library_categories">Configure visibility and order of library categories.</string>
@@ -402,6 +409,7 @@
     <string name="pref_title_extra_controls">Extra controls</string>
     <string name="pref_title_extra_song_info">Song info</string>
     <string name="pref_title_gapless_playback">Gapless playback</string>
+    <string name="pref_title_resume_long_tracks">Resume long tracks</string>
     <string name="pref_title_general_theme">App theme</string>
     <string name="pref_title_home_album_grid_style">Album grid</string>
     <string name="pref_title_home_artist_grid_style">Artist grid</string>

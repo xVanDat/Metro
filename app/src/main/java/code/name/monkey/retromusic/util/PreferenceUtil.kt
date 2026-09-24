@@ -315,6 +315,9 @@ object PreferenceUtil {
             GAP_LESS_PLAYBACK, false
         )
 
+    val isResumeLongTracks
+        get() = sharedPreferences.getBoolean(RESUME_LONG_TRACKS, true)
+
     val isAdaptiveColor
         get() = sharedPreferences.getBoolean(
             ADAPTIVE_COLOR_APP, false

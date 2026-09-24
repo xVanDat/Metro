@@ -62,6 +62,11 @@
         android:title="@string/action_save_playing_queue"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_bookmarks"
+        android:orderInCategory="7"
+        android:title="@string/bookmarks"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_share"
         android:orderInCategory="7"
         android:title="@string/action_share" />

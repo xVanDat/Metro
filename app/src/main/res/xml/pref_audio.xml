@@ -33,6 +33,13 @@
         android:summary="@string/pref_summary_gapless_playback"
         android:title="@string/pref_title_gapless_playback" />
 
+    <code.name.monkey.appthemehelper.common.prefs.supportv7.ATESwitchPreference
+        android:defaultValue="true"
+        android:key="resume_long_tracks"
+        android:layout="@layout/list_item_view_switch"
+        android:summary="@string/pref_summary_resume_long_tracks"
+        android:title="@string/pref_title_resume_long_tracks" />
+
     <code.name.monkey.appthemehelper.common.prefs.supportv7.ATEPreference
         android:key="equalizer"
         android:layout="@layout/list_item_view_no_title"
