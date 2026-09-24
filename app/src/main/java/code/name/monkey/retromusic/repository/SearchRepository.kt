@@ -22,6 +22,8 @@ import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Song
+import java.text.Normalizer
+import java.util.Locale
 
 class RealSearchRepository(
     private val songRepository: SongRepository,
@@ -34,10 +36,17 @@ class RealSearchRepository(
         val results = mutableListOf<Any>()
         if (query.isNullOrEmpty()) return results
         query.let { searchString ->
+            val normalizedQuery = searchString.normalizedForSearch()
+            val needsAccentInsensitiveSearch =
+                normalizedQuery == searchString.lowercase(Locale.ROOT)
 
             /** Songs **/
             val songs: List<Song> = if (filter == Filter.SONGS || filter == Filter.NO_FILTER) {
-                songRepository.songs(searchString)
+                if (needsAccentInsensitiveSearch) {
+                    songRepository.songs().filter { it.title.matchesSearch(normalizedQuery) }
+                } else {
+                    songRepository.songs(searchString)
+                }
             } else {
                 emptyList()
             }
@@ -49,7 +58,11 @@ class RealSearchRepository(
             /** Artists **/
             val artists: List<Artist> =
                 if (filter == Filter.ARTISTS || filter == Filter.NO_FILTER) {
-                    artistRepository.artists(searchString)
+                    if (needsAccentInsensitiveSearch) {
+                        artistRepository.artists().filter { it.name.matchesSearch(normalizedQuery) }
+                    } else {
+                        artistRepository.artists(searchString)
+                    }
                 } else {
                     emptyList()
                 }
@@ -60,7 +73,11 @@ class RealSearchRepository(
 
             /** Albums **/
             val albums: List<Album> = if (filter == Filter.ALBUMS || filter == Filter.NO_FILTER) {
-                albumRepository.albums(searchString)
+                if (needsAccentInsensitiveSearch) {
+                    albumRepository.albums().filter { it.title.matchesSearch(normalizedQuery) }
+                } else {
+                    albumRepository.albums(searchString)
+                }
             } else {
                 emptyList()
             }
@@ -72,7 +89,12 @@ class RealSearchRepository(
             /** Album-Artists **/
             val albumArtists: List<Artist> =
                 if (filter == Filter.ALBUM_ARTISTS || filter == Filter.NO_FILTER) {
-                    artistRepository.albumArtists(searchString)
+                    if (needsAccentInsensitiveSearch) {
+                        artistRepository.albumArtists()
+                            .filter { it.name.matchesSearch(normalizedQuery) }
+                    } else {
+                        artistRepository.albumArtists(searchString)
+                    }
                 } else {
                     emptyList()
                 }
@@ -83,7 +105,11 @@ class RealSearchRepository(
 
             /** Genres **/
             val genres: List<Genre> = if (filter == Filter.GENRES || filter == Filter.NO_FILTER) {
-                genreRepository.genres(query)
+                if (needsAccentInsensitiveSearch) {
+                    genreRepository.genres().filter { it.name.matchesSearch(normalizedQuery) }
+                } else {
+                    genreRepository.genres(query)
+                }
             } else {
                 emptyList()
             }
@@ -96,7 +122,7 @@ class RealSearchRepository(
             val playlist: List<PlaylistWithSongs> =
                 if (filter == Filter.PLAYLISTS || filter == Filter.NO_FILTER) {
                     roomRepository.playlistWithSongs().filter { playlist ->
-                        playlist.playlistEntity.playlistName.lowercase().contains(searchString.lowercase())
+                        playlist.playlistEntity.playlistName.matchesSearch(normalizedQuery)
                     }
                 } else {
                     emptyList()
@@ -109,4 +135,15 @@ class RealSearchRepository(
         }
         return results
     }
+}
+
+private fun String.matchesSearch(normalizedQuery: String): Boolean {
+    return normalizedForSearch().contains(normalizedQuery)
+}
+
+private fun String.normalizedForSearch(): String {
+    return Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("đ", "d", ignoreCase = true)
+        .replace("\\p{Mn}+".toRegex(), "")
+        .lowercase(Locale.ROOT)
 }

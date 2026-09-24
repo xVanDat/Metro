@@ -475,6 +475,8 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="saved_playlist_to">Danh sách phát đã lưu đến %s.</string>
     <string name="saving_changes">Lưu thay đổi</string>
     <string name="scan_media">Quét phương tiện</string>
+    <string name="rescan_library">Quét lại thư viện nhạc</string>
+    <string name="scanning_library">Đang tìm tệp âm thanh trên bộ nhớ trong và thẻ SD…</string>
     <string name="scanned_files">Đã sửa %1$d trong %2$d tập tin.</string>
     <string name="scrobbles_label">Scrobbles</string>
     <string name="select_all">Chọn tất cả</string>

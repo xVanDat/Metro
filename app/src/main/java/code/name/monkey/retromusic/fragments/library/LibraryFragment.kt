@@ -14,6 +14,7 @@
  */
 package code.name.monkey.retromusic.fragments.library
 
+import android.media.MediaScannerConnection
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -22,6 +23,7 @@ import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
+import androidx.lifecycle.lifecycleScope
 import code.name.monkey.appthemehelper.common.ATHToolbarActivity.getToolbarBackgroundColor
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
 import code.name.monkey.retromusic.R
@@ -29,9 +31,17 @@ import code.name.monkey.retromusic.databinding.FragmentLibraryBinding
 import code.name.monkey.retromusic.dialogs.CreatePlaylistDialog
 import code.name.monkey.retromusic.dialogs.ImportPlaylistDialog
 import code.name.monkey.retromusic.extensions.whichFragment
+import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
+import code.name.monkey.retromusic.fragments.folder.FoldersFragment
+import code.name.monkey.retromusic.misc.UpdateToastMediaScannerCompletionListener
 import code.name.monkey.retromusic.model.CategoryInfo
+import code.name.monkey.retromusic.util.FileUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 class LibraryFragment : AbsMainActivityFragment(R.layout.fragment_library) {
 
@@ -86,6 +96,8 @@ class LibraryFragment : AbsMainActivityFragment(R.layout.fragment_library) {
 
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_main, menu)
+        menu.add(0, R.id.action_scan, 9, R.string.rescan_library)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         ToolbarContentTintHelper.handleOnCreateOptionsMenu(
             requireContext(),
             binding.toolbar,
@@ -109,8 +121,44 @@ class LibraryFragment : AbsMainActivityFragment(R.layout.fragment_library) {
                 childFragmentManager,
                 "ShowCreatePlaylistDialog"
             )
+            R.id.action_scan -> rescanLibrary()
         }
         return false
+    }
+
+    private fun rescanLibrary() {
+        showToast(R.string.scanning_library)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val roots = requireContext().getExternalFilesDirs(null)
+                .mapNotNull(::findStorageRoot)
+                .distinctBy(FileUtil::safeGetCanonicalPath)
+            val paths = FileUtil.listFilesDeep(roots, FoldersFragment.AUDIO_FILE_FILTER)
+                .map(FileUtil::safeGetCanonicalPath)
+                .toTypedArray()
+            withContext(Dispatchers.Main) {
+                if (paths.isEmpty()) {
+                    showToast(R.string.nothing_to_scan)
+                } else {
+                    MediaScannerConnection.scanFile(
+                        requireContext(),
+                        paths,
+                        null,
+                        UpdateToastMediaScannerCompletionListener(
+                            requireActivity(),
+                            paths.toList()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun findStorageRoot(appFilesDirectory: File?): File? {
+        var directory = appFilesDirectory
+        while (directory != null && directory.name != "Android") {
+            directory = directory.parentFile
+        }
+        return directory?.parentFile
     }
 
     override fun onDestroyView() {

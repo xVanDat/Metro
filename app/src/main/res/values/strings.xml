@@ -480,6 +480,8 @@
     <string name="saved_playlist_to">Saved playlist to %s.</string>
     <string name="saving_changes">Saving changes</string>
     <string name="scan_media">Scan media</string>
+    <string name="rescan_library">Rescan music library</string>
+    <string name="scanning_library">Looking for audio files on internal storage and SD cards…</string>
     <string name="scanned_files">Scanned %1$d of %2$d files.</string>
     <string name="scrobbles_label">Scrobbles</string>
     <string name="select_all">Select all</string>
