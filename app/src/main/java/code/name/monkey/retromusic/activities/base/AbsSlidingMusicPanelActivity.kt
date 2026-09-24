@@ -74,6 +74,8 @@ import code.name.monkey.retromusic.fragments.player.normal.PlayerFragment
 import code.name.monkey.retromusic.fragments.player.peek.PeekPlayerFragment
 import code.name.monkey.retromusic.fragments.player.plain.PlainPlayerFragment
 import code.name.monkey.retromusic.fragments.player.simple.SimplePlayerFragment
+import code.name.monkey.retromusic.fragments.player.streaming.SpotifyPlayerFragment
+import code.name.monkey.retromusic.fragments.player.streaming.YouTubeMusicPlayerFragment
 import code.name.monkey.retromusic.fragments.player.tiny.TinyPlayerFragment
 import code.name.monkey.retromusic.fragments.queue.PlayingQueueFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
@@ -408,7 +410,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
                 navigationBarColor = Color.BLACK
                 setLightStatusBar(false)
                 setLightNavigationBar(true)
-            } else if (nowPlayingScreen == Color || nowPlayingScreen == Tiny || nowPlayingScreen == Gradient) {
+            } else if (nowPlayingScreen == Color || nowPlayingScreen == Tiny || nowPlayingScreen == Gradient || nowPlayingScreen == Spotify || nowPlayingScreen == YouTubeMusic) {
                 animateNavigationBarColor(paletteColor)
                 navigationBarColor = paletteColor
                 setLightNavigationBar(isColorLight)
@@ -568,10 +570,12 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
             Full -> FullPlayerFragment()
             Plain -> PlainPlayerFragment()
             Simple -> SimplePlayerFragment()
+            Spotify -> SpotifyPlayerFragment()
             Material -> MaterialFragment()
             Color -> ColorFragment()
             Gradient -> GradientPlayerFragment()
             Tiny -> TinyPlayerFragment()
+            YouTubeMusic -> YouTubeMusicPlayerFragment()
             Peek -> PeekPlayerFragment()
             Circle -> CirclePlayerFragment()
             Classic -> ClassicPlayerFragment()

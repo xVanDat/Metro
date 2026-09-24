@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#101010">
+
+    <View
+        android:id="@+id/colorGradientBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include layout="@layout/shadow_statusbar_toolbar" />
+    <include layout="@layout/status_bar" />
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/playerToolbar"
+        style="@style/Toolbar"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_bar"
+        app:navigationIcon="@drawable/ic_keyboard_arrow_down"
+        app:title="@string/spotify_style" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playerAlbumCoverFragment"
+        android:name="code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@id/lyricsPreview"
+        app:layout_constraintEnd_toStartOf="@id/playbackControlsFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playerToolbar"
+        app:layout_constraintWidth_percent="0.46" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/lyricsPreview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_spotify_lyrics_preview"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:padding="12dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/playerAlbumCoverFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playerAlbumCoverFragment"
+        tools:text="I miss your voice on my phone"
+        tools:visibility="visible" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playbackControlsFragment"
+        android:name="code.name.monkey.retromusic.fragments.player.streaming.SpotifyPlaybackControlsFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/playerAlbumCoverFragment"
+        app:layout_constraintTop_toBottomOf="@id/playerToolbar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

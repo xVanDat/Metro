@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#090A05">
+
+    <View
+        android:id="@+id/colorGradientBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include layout="@layout/shadow_statusbar_toolbar" />
+    <include layout="@layout/status_bar" />
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/playerToolbar"
+        style="@style/Toolbar"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_bar"
+        app:navigationIcon="@drawable/ic_keyboard_arrow_down"
+        app:title="@string/youtube_music_style" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playerAlbumCoverFragment"
+        android:name="code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/playbackControlsFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playerToolbar"
+        app:layout_constraintWidth_percent="0.46" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playbackControlsFragment"
+        android:name="code.name.monkey.retromusic.fragments.player.streaming.YouTubeMusicPlaybackControlsFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/playerAlbumCoverFragment"
+        app:layout_constraintTop_toBottomOf="@id/playerToolbar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

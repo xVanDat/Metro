@@ -589,4 +589,6 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="settings_group_playback">Phát lại</string>
     <string name="settings_group_library_data">Thư viện và dữ liệu</string>
     <string name="settings_group_information">Thông tin</string>
+    <string name="youtube_music_style">Phong cách YouTube Music</string>
+    <string name="spotify_style">Phong cách Spotify</string>
 </resources>

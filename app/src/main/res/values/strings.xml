@@ -594,4 +594,6 @@
     <string name="settings_group_playback">Playback</string>
     <string name="settings_group_library_data">Library and data</string>
     <string name="settings_group_information">Information</string>
+    <string name="youtube_music_style">YouTube Music style</string>
+    <string name="spotify_style">Spotify style</string>
 </resources>

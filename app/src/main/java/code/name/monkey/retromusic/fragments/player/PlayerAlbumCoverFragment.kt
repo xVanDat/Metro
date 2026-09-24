@@ -132,7 +132,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
         binding.viewPager.addOnPageChangeListener(this)
         val nps = PreferenceUtil.nowPlayingScreen
 
-        if (nps == Full || nps == Classic || nps == Fit || nps == Gradient) {
+        if (nps == Full || nps == Classic || nps == Fit || nps == Gradient || nps == Spotify || nps == YouTubeMusic) {
             binding.viewPager.offscreenPageLimit = 2
         } else if (PreferenceUtil.isCarouselEffect) {
             val metrics = resources.displayMetrics
