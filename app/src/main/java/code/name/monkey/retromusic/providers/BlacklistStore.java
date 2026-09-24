@@ -29,6 +29,8 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 
 import code.name.monkey.retromusic.util.FileUtil;
 import code.name.monkey.retromusic.util.PreferenceUtil;
@@ -171,6 +173,42 @@ public class BlacklistStore extends SQLiteOpenHelper {
     final SQLiteDatabase database = getWritableDatabase();
     database.delete(BlacklistStoreColumns.NAME, null, null);
 
+    notifyMediaStoreChanged();
+  }
+
+  public void replacePaths(@NonNull Collection<String> paths) {
+    final SQLiteDatabase database = getWritableDatabase();
+    final ArrayList<String> canonicalPaths = new ArrayList<>();
+    for (String path : paths) {
+      if (path != null && !path.trim().isEmpty()) {
+        canonicalPaths.add(FileUtil.safeGetCanonicalPath(new File(path)));
+      }
+    }
+    canonicalPaths.sort(Comparator.comparingInt(String::length));
+
+    database.beginTransaction();
+    try {
+      database.delete(BlacklistStoreColumns.NAME, null, null);
+      final ArrayList<String> insertedPaths = new ArrayList<>();
+      for (String path : canonicalPaths) {
+        boolean covered = false;
+        for (String insertedPath : insertedPaths) {
+          if (path.equals(insertedPath) || path.startsWith(insertedPath + File.separator)) {
+            covered = true;
+            break;
+          }
+        }
+        if (!covered) {
+          final ContentValues values = new ContentValues(1);
+          values.put(BlacklistStoreColumns.PATH, path);
+          database.insert(BlacklistStoreColumns.NAME, null, values);
+          insertedPaths.add(path);
+        }
+      }
+      database.setTransactionSuccessful();
+    } finally {
+      database.endTransaction();
+    }
     notifyMediaStoreChanged();
   }
 

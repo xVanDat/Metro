@@ -90,6 +90,7 @@
         <![CDATA[Backup & Restore]]>
     </string>
     <string name="backup_title">Backups</string>
+    <string name="library_data">Library data (blacklist, history, play counts and queue)</string>
     <string name="biography">Biography</string>
     <string name="black_theme_name">Just Black</string>
     <string name="blacklist">Blacklist</string>

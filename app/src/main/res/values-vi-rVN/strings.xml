@@ -86,6 +86,7 @@
     <string name="backup_restore_settings_summary">Lưu trữ và khôi phục lại tùy chọn, danh sách phát của bạn</string>
     <string name="backup_restore_title"><![CDATA[Sao lưu & Khôi phục]]></string>
     <string name="backup_title">Bản sao lưu</string>
+    <string name="library_data">Dữ liệu thư viện (danh sách đen, lịch sử, số lần phát và hàng đợi)</string>
     <string name="biography">Tiểu sử</string>
     <string name="black_theme_name">Đen hoàn toàn</string>
     <string name="blacklist">Danh sách đen</string>

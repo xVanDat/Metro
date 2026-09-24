@@ -43,6 +43,7 @@ class RestoreActivity : AppCompatActivity() {
         }
         binding.restoreButton.accentColor()
         binding.checkArtistImages.addAccentColor()
+        binding.checkLibraryData.addAccentColor()
         binding.checkPlaylists.addAccentColor()
         binding.checkSettings.addAccentColor()
         binding.checkUserImages.addAccentColor()
@@ -52,6 +53,7 @@ class RestoreActivity : AppCompatActivity() {
             if (binding.checkArtistImages.isChecked) backupContents.add(CUSTOM_ARTIST_IMAGES)
             if (binding.checkSettings.isChecked) backupContents.add(SETTINGS)
             if (binding.checkUserImages.isChecked) backupContents.add(USER_IMAGES)
+            if (binding.checkLibraryData.isChecked) backupContents.add(LIBRARY_DATA)
             lifecycleScope.launch(Dispatchers.IO) {
                 if (backupUri != null) {
                     contentResolver.openInputStream(backupUri)?.use {

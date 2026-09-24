@@ -26,6 +26,9 @@ interface HistoryDao {
     @Upsert
     suspend fun upsertSongInHistory(historyEntity: HistoryEntity)
 
+    @Upsert
+    suspend fun upsertSongsInHistory(historyEntities: List<HistoryEntity>)
+
     @Query("DELETE FROM HistoryEntity WHERE id= :songId")
     fun deleteSongInHistory(songId: Long)
 
