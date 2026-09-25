@@ -27,7 +27,9 @@ import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.util.MusicUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.google.android.material.slider.Slider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class StreamingPlaybackControlsFragment(@LayoutRes layout: Int) :
     AbsPlayerControlsFragment(layout) {
@@ -107,11 +109,15 @@ abstract class StreamingPlaybackControlsFragment(@LayoutRes layout: Int) :
 
     fun refreshFavorite() {
         if (!isAdded || favoriteView == null) return
-        lifecycleScope.launch {
-            val isFavorite = MusicUtil.isFavorite(MusicPlayerRemote.currentSong)
-            favoriteView?.setImageResource(
-                if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border,
-            )
+        val song = MusicPlayerRemote.currentSong
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isFavorite = MusicUtil.isFavorite(song)
+            withContext(Dispatchers.Main) {
+                if (!isAdded || MusicPlayerRemote.currentSong.id != song.id) return@withContext
+                favoriteView?.setImageResource(
+                    if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border,
+                )
+            }
         }
     }
 
