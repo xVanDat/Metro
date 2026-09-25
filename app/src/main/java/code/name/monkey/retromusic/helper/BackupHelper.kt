@@ -23,6 +23,7 @@ import code.name.monkey.retromusic.service.MusicService.Companion.SAVED_POSITION
 import code.name.monkey.retromusic.service.MusicService.Companion.SAVED_POSITION_IN_TRACK
 import code.name.monkey.retromusic.util.getExternalStoragePublicDirectory
 import com.google.gson.Gson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -38,46 +39,54 @@ object BackupHelper : KoinComponent {
     private val repository by inject<Repository>()
     private val songRepository by inject<SongRepository>()
 
-    suspend fun createBackup(context: Context, name: String) {
-        val backupFile =
-            File(getBackupRoot(), name + APPEND_EXTENSION)
-        if (backupFile.parentFile?.exists() != true) {
-            backupFile.parentFile?.mkdirs()
+    suspend fun createBackup(context: Context, name: String) = withContext(Dispatchers.IO) {
+        val backupFile = File(getBackupRoot(), name + APPEND_EXTENSION)
+        val cachedPlaylists = File(context.filesDir, PLAYLISTS_PATH)
+        val cachedLibraryData = File(context.cacheDir, LIBRARY_DATA_FILE)
+
+        try {
+            if (backupFile.parentFile?.exists() != true &&
+                backupFile.parentFile?.mkdirs() != true
+            ) {
+                error("Could not create the backup directory")
+            }
+
+            val zipItems = mutableListOf<ZipItem>()
+            zipItems.addAll(getPlaylistZipItems(context))
+            zipItems.addAll(getSettingsZipItems(context))
+            getUserImageZipItems(context)?.let { zipItems.addAll(it) }
+            zipItems.addAll(getCustomArtistZipItems(context))
+            zipItems.add(getLibraryDataZipItem(context))
+
+            zipAll(zipItems, backupFile)
+            withContext(Dispatchers.Main) {
+                context.showToast(R.string.message_backup_create_success)
+            }
+        } catch (exception: CancellationException) {
+            backupFile.delete()
+            throw exception
+        } catch (exception: Exception) {
+            backupFile.delete()
+            withContext(Dispatchers.Main) {
+                context.showToast(R.string.error_create_backup)
+            }
+        } finally {
+            cachedPlaylists.deleteRecursively()
+            cachedLibraryData.delete()
         }
-        val zipItems = mutableListOf<ZipItem>()
-        zipItems.addAll(getPlaylistZipItems(context))
-        zipItems.addAll(getSettingsZipItems(context))
-        getUserImageZipItems(context)?.let { zipItems.addAll(it) }
-        zipItems.addAll(getCustomArtistZipItems(context))
-        zipItems.add(getLibraryDataZipItem(context))
-        zipAll(context, zipItems, backupFile)
-        // Clean Cache Playlist Directory
-        File(context.filesDir, PLAYLISTS_PATH).deleteRecursively()
-        File(context.cacheDir, LIBRARY_DATA_FILE).delete()
     }
 
-    private suspend fun zipAll(context: Context, zipItems: List<ZipItem>, backupFile: File) =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                backupFile.outputStream().buffered().zipOutputStream().use { out ->
-                    for (zipItem in zipItems) {
-                        File(zipItem.filePath).inputStream().buffered().use { origin ->
-                            val entry = ZipEntry(zipItem.zipPath)
-                            out.putNextEntry(entry)
-                            origin.copyTo(out)
-                        }
-                    }
-                }
-            }.onFailure {
-                withContext(Dispatchers.Main) {
-                    context.showToast(R.string.error_create_backup)
-                }
-            }.onSuccess {
-                withContext(Dispatchers.Main) {
-                    context.showToast(R.string.message_backup_create_success)
+    private fun zipAll(zipItems: List<ZipItem>, backupFile: File) {
+        backupFile.outputStream().buffered().zipOutputStream().use { out ->
+            for (zipItem in zipItems) {
+                File(zipItem.filePath).inputStream().buffered().use { origin ->
+                    val entry = ZipEntry(zipItem.zipPath)
+                    out.putNextEntry(entry)
+                    origin.copyTo(out)
                 }
             }
         }
+    }
 
     private suspend fun getPlaylistZipItems(context: Context): List<ZipItem> {
         val playlistZipItems = mutableListOf<ZipItem>()
