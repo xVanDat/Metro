@@ -65,8 +65,24 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
 
     private fun updateLocale() {
         val localeCode = PreferenceUtil.languageCode
+            .takeIf { it == "auto" || it.substringBefore('-') in SUPPORTED_LANGUAGES }
+            ?: "auto"
+        if (PreferenceUtil.languageCode != localeCode) {
+            PreferenceUtil.languageCode = localeCode
+        }
+
+        val currentLanguage = AppCompatDelegate.getApplicationLocales()
+            .get(0)?.language
+        if (currentLanguage != null && currentLanguage !in SUPPORTED_LANGUAGES) {
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+        }
         if (PreferenceUtil.isLocaleAutoStorageEnabled) {
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(localeCode))
+            val locales = if (localeCode == "auto") {
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(localeCode)
+            }
+            AppCompatDelegate.setApplicationLocales(locales)
             PreferenceUtil.isLocaleAutoStorageEnabled = true
         }
     }
@@ -108,5 +124,9 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)
+    }
+
+    companion object {
+        private val SUPPORTED_LANGUAGES = setOf("en", "vi")
     }
 }

@@ -343,6 +343,9 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="pref_keep_screen_on_summary">Lưu ý rằng việc bật tính năng này có thể ảnh hưởng đến tuổi thọ pin</string>
     <string name="pref_keep_screen_on_title">Giữ màn hình luôn bật</string>
     <string name="pref_language_name">Chọn ngôn ngữ</string>
+    <string name="language_system_default">Theo hệ thống</string>
+    <string name="language_english">Tiếng Anh</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
     <string name="pref_snow_fall_title">Hiệu ứng tuyết rơi</string>
     <string name="pref_summary_album_art_on_lockscreen">Sử dụng ảnh bìa album bài hát đang phát làm ảnh nền màn hình khóa.</string>
     <string name="pref_summary_album_artists_only">Hiển thị Album Nghệ sĩ trong danh mục Nghệ sĩ</string>
