@@ -19,12 +19,10 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.VersionUtils
@@ -55,8 +53,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
  */
 
 class FullPlaybackControlsFragment :
-    AbsPlayerControlsFragment(R.layout.fragment_full_player_controls),
-    PopupMenu.OnMenuItemClickListener {
+    AbsPlayerControlsFragment(R.layout.fragment_full_player_controls) {
 
     private val libraryViewModel: LibraryViewModel by activityViewModel()
     private var _binding: FragmentFullPlayerControlsBinding? = null
@@ -190,17 +187,8 @@ class FullPlaybackControlsFragment :
 
     private fun setupMenu() {
         binding.playerMenu.setOnClickListener {
-            val popupMenu = PopupMenu(requireContext(), it)
-            popupMenu.setOnMenuItemClickListener(this)
-            popupMenu.inflate(R.menu.menu_player)
-            popupMenu.menu.findItem(R.id.action_toggle_favorite).isVisible = false
-            popupMenu.menu.findItem(R.id.action_toggle_lyrics).isChecked = PreferenceUtil.showLyrics
-            popupMenu.show()
+            (parentFragment as? FullPlayerFragment)?.showPlayerMenu(showFavorite = false)
         }
-    }
-
-    override fun onMenuItemClick(item: MenuItem?): Boolean {
-        return (parentFragment as FullPlayerFragment).onMenuItemClick(item!!)
     }
 
     override fun onRepeatModeChanged() {

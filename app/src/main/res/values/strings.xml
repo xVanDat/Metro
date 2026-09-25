@@ -296,6 +296,7 @@
     <string name="notification">Notification</string>
     <string name="notification_settings_summary">Customize the notification style</string>
     <string name="now_playing">Now playing</string>
+    <string name="player_options">Player options</string>
     <string name="now_playing_queue">Now playing queue</string>
     <string name="now_playing_summary">Customize the now playing screen</string>
     <string name="now_playing_themes">9+ now playing themes</string>

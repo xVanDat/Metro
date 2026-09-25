@@ -257,6 +257,11 @@ public class LrcView extends View {
         postInvalidate();
     }
 
+    public void setNormalColor(int normalColor) {
+        mNormalTextColor = normalColor;
+        postInvalidate();
+    }
+
     public void setTimelineTextColor(int timelineTextColor) {
         mTimelineTextColor = timelineTextColor;
         postInvalidate();

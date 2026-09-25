@@ -29,6 +29,11 @@ abstract class StreamingPlayerFragment(
     private val supportsSyncedLyrics: Boolean = false,
 ) : AbsPlayerFragment(layout) {
 
+    override val showLyricsInPlayerMenu: Boolean
+        get() = supportsSyncedLyrics
+
+    override val showQueueInPlayerMenu: Boolean = false
+
     private var lastColor = Color.BLACK
     private lateinit var controlsFragment: StreamingPlaybackControlsFragment
     private var toolbar: Toolbar? = null

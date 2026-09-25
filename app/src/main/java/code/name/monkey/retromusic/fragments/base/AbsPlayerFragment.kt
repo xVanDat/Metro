@@ -27,8 +27,10 @@ import android.view.GestureDetector
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.annotation.LayoutRes
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -82,6 +84,15 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
         get() = activity as MainActivity
 
     private var playerAlbumCoverFragment: PlayerAlbumCoverFragment? = null
+
+    protected open val showLyricsInPlayerMenu: Boolean
+        get() = PreferenceUtil.nowPlayingScreen !in setOf(
+            NowPlayingScreen.Circle,
+            NowPlayingScreen.Peek,
+            NowPlayingScreen.Tiny,
+        )
+
+    protected open val showQueueInPlayerMenu: Boolean = true
 
     override fun onMenuItemClick(
         item: MenuItem,
@@ -329,6 +340,12 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        childFragmentManager.setFragmentResultListener(
+            PlayerMenuDialog.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, result ->
+            dispatchPlayerMenuItem(result.getInt(PlayerMenuDialog.RESULT_ITEM_ID))
+        }
         if (PreferenceUtil.isFullScreenMode &&
             view.findViewById<View>(R.id.status_bar) != null
         ) {
@@ -354,6 +371,64 @@ abstract class AbsPlayerFragment(@LayoutRes layout: Int) : AbsMusicServiceFragme
                 showLyricsIcon(this)
             }
         }
+        bindFullScreenOverflowMenu()
+    }
+
+    /** Opens the same player actions as a full-screen, touch-friendly menu. */
+    fun showPlayerMenu(
+        showLyrics: Boolean = showLyricsInPlayerMenu,
+        showFavorite: Boolean = true,
+        showQueue: Boolean = showQueueInPlayerMenu,
+    ) {
+        if (!isAdded || childFragmentManager.findFragmentByTag(PlayerMenuDialog.TAG) != null) {
+            return
+        }
+        val songId = MusicPlayerRemote.currentSong.id
+        lifecycleScope.launch(IO) {
+            val isFavorite = showFavorite &&
+                libraryViewModel.isSongFavorite(songId)
+            withContext(Main) {
+                if (!isAdded || childFragmentManager.isStateSaved ||
+                    MusicPlayerRemote.currentSong.id != songId
+                ) {
+                    return@withContext
+                }
+                PlayerMenuDialog.newInstance(
+                    showLyrics = showLyrics,
+                    lyricsChecked = PreferenceUtil.showLyrics,
+                    showFavorite = showFavorite,
+                    favoriteChecked = isFavorite,
+                    showQueue = showQueue,
+                ).show(childFragmentManager, PlayerMenuDialog.TAG)
+            }
+        }
+    }
+
+    private fun dispatchPlayerMenuItem(itemId: Int) {
+        val anchor = view ?: return
+        val menu = PopupMenu(requireContext(), anchor).apply {
+            menuInflater.inflate(R.menu.menu_player, this.menu)
+        }.menu
+        menu.findItem(itemId)?.let(::onMenuItemClick)
+    }
+
+    private fun bindFullScreenOverflowMenu() {
+        val toolbar = playerToolbar() ?: return
+        toolbar.post {
+            toolbar.findOverflowMenuButton()?.setOnClickListener {
+                showPlayerMenu()
+            }
+        }
+    }
+
+    private fun View.findOverflowMenuButton(): View? {
+        if (javaClass.name.contains("OverflowMenuButton")) return this
+        if (this is ViewGroup) {
+            for (index in 0 until childCount) {
+                getChildAt(index).findOverflowMenuButton()?.let { return it }
+            }
+        }
+        return null
     }
 
     override fun onStart() {

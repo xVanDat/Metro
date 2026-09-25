@@ -23,7 +23,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
@@ -67,7 +66,7 @@ import kotlinx.coroutines.withContext
 
 class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_player),
     MusicProgressViewUpdateHelper.Callback,
-    View.OnLayoutChangeListener, PopupMenu.OnMenuItemClickListener {
+    View.OnLayoutChangeListener {
     private var lastColor: Int = 0
     private var lastPlaybackControlsColor: Int = 0
     private var lastDisabledPlaybackControlsColor: Int = 0
@@ -135,12 +134,7 @@ class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_play
 
     private fun setupMenu() {
         binding.playbackControlsFragment.playerMenu.setOnClickListener {
-            val popupMenu = PopupMenu(requireContext(), it)
-            popupMenu.setOnMenuItemClickListener(this)
-            popupMenu.inflate(R.menu.menu_player)
-            popupMenu.menu.findItem(R.id.action_toggle_favorite).isVisible = false
-            popupMenu.menu.findItem(R.id.action_toggle_lyrics).isChecked = PreferenceUtil.showLyrics
-            popupMenu.show()
+            showPlayerMenu(showFavorite = false)
         }
     }
 

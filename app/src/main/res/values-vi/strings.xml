@@ -291,6 +291,7 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="notification">Thông báo</string>
     <string name="notification_settings_summary">Tùy chỉnh kiểu thông báo</string>
     <string name="now_playing">Màn hình phát</string>
+    <string name="player_options">Tuỳ chọn trình phát</string>
     <string name="now_playing_queue">Đang phát danh sách chờ</string>
     <string name="now_playing_summary">Tùy chỉnh màn hình phát</string>
     <string name="now_playing_themes">Hơn 9 giao diện màn hình phát</string>

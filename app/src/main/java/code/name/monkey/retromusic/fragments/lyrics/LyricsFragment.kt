@@ -16,6 +16,8 @@ package code.name.monkey.retromusic.fragments.lyrics
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -34,10 +36,16 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.tageditor.TagWriter
 import code.name.monkey.retromusic.databinding.FragmentLyricsBinding
 import code.name.monkey.retromusic.extensions.accentColor
+import code.name.monkey.retromusic.extensions.setLightNavigationBarAuto
+import code.name.monkey.retromusic.extensions.setLightStatusBarAuto
 import code.name.monkey.retromusic.extensions.materialDialog
 import code.name.monkey.retromusic.extensions.openUrl
 import code.name.monkey.retromusic.extensions.uri
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
+import code.name.monkey.retromusic.glide.RetroGlideExtension
+import code.name.monkey.retromusic.glide.RetroGlideExtension.asBitmapPalette
+import code.name.monkey.retromusic.glide.RetroGlideExtension.songCoverOptions
+import code.name.monkey.retromusic.glide.palette.BitmapPaletteWrapper
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
 import code.name.monkey.retromusic.lyrics.LrcView
@@ -46,6 +54,11 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.FileUtils
 import code.name.monkey.retromusic.util.LyricUtil
 import code.name.monkey.retromusic.util.UriUtil
+import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.afollestad.materialdialogs.input.input
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -82,6 +95,9 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         }
 
     private lateinit var updateHelper: MusicProgressViewUpdateHelper
+    private var paletteTarget: Target<BitmapPaletteWrapper>? = null
+    private var previousStatusBarColor: Int? = null
+    private var previousNavigationBarColor: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,9 +125,11 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
         enterTransition = Fade()
         exitTransition = Fade()
         _binding = FragmentLyricsBinding.bind(view)
+        previousStatusBarColor = requireActivity().window.statusBarColor
+        previousNavigationBarColor = requireActivity().window.navigationBarColor
         updateHelper = MusicProgressViewUpdateHelper(this, 500, 1000)
-        updateTitleSong()
         setupLyricsView()
+        updateTitleSong()
         loadLyrics()
 
         setupWakelock()
@@ -164,6 +182,72 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
 
     private fun updateTitleSong() {
         song = MusicPlayerRemote.currentSong
+        updateLyricsBackground()
+    }
+
+    private fun updateLyricsBackground() {
+        paletteTarget?.let { Glide.with(this).clear(it) }
+        val currentSong = song
+        if (currentSong.id < 0) {
+            applyLyricsColors(MediaNotificationProcessor.errorColor(requireContext()))
+            return
+        }
+        paletteTarget = Glide.with(this)
+            .asBitmapPalette()
+            .songCoverOptions(currentSong)
+            .load(RetroGlideExtension.getSongModel(currentSong))
+            .into(object : CustomTarget<BitmapPaletteWrapper>() {
+                override fun onResourceReady(
+                    resource: BitmapPaletteWrapper,
+                    transition: Transition<in BitmapPaletteWrapper>?,
+                ) {
+                    if (!isAdded || MusicPlayerRemote.currentSong.id != currentSong.id) return
+                    applyLyricsColors(
+                        MediaNotificationProcessor(requireContext(), resource.bitmap)
+                    )
+                }
+
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    if (isAdded) {
+                        applyLyricsColors(MediaNotificationProcessor.errorColor(requireContext()))
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) = Unit
+            })
+    }
+
+    private fun applyLyricsColors(colors: MediaNotificationProcessor) {
+        val background = colors.backgroundColor
+        val primary = colors.primaryTextColor
+        val secondary = colors.secondaryTextColor
+
+        binding.container.setBackgroundColor(background)
+        binding.appBarLayout.setBackgroundColor(background)
+        binding.toolbar.setBackgroundColor(background)
+        ToolbarContentTintHelper.colorizeToolbar(
+            binding.toolbar,
+            primary,
+            requireActivity(),
+        )
+        binding.normalLyrics.setTextColor(primary)
+        binding.noLyricsFound.setTextColor(primary)
+        binding.lyricsView.apply {
+            setCurrentColor(primary)
+            setNormalColor(secondary)
+            setTimeTextColor(primary)
+            setTimelineColor(primary)
+            setTimelineTextColor(primary)
+        }
+        binding.editButton.backgroundTintList = ColorStateList.valueOf(primary)
+        binding.editButton.imageTintList = ColorStateList.valueOf(background)
+
+        requireActivity().window.apply {
+            statusBarColor = background
+            navigationBarColor = background
+        }
+        mainActivity.setLightStatusBarAuto(background)
+        mainActivity.setLightNavigationBarAuto(background)
     }
 
     private fun setupToolbar() {
@@ -360,10 +444,20 @@ class LyricsFragment : AbsMainActivityFragment(R.layout.fragment_lyrics),
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        paletteTarget?.let { Glide.with(this).clear(it) }
+        paletteTarget = null
+        previousStatusBarColor?.let {
+            requireActivity().window.statusBarColor = it
+            mainActivity.setLightStatusBarAuto(it)
+        }
+        previousNavigationBarColor?.let {
+            requireActivity().window.navigationBarColor = it
+            mainActivity.setLightNavigationBarAuto(it)
+        }
         if (MusicPlayerRemote.playingQueue.isNotEmpty())
             mainActivity.expandPanel()
         _binding = null
+        super.onDestroyView()
     }
 
     enum class LyricsType {
