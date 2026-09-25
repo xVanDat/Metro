@@ -16,14 +16,13 @@ package code.name.monkey.retromusic.fragments.settings
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.preference.Preference
 import code.name.monkey.retromusic.LANGUAGE_NAME
 import code.name.monkey.retromusic.LAST_ADDED_CUTOFF
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.fragments.LibraryViewModel
 import code.name.monkey.retromusic.fragments.ReloadType.HomeSections
+import code.name.monkey.retromusic.util.AppLocaleManager
 import code.name.monkey.retromusic.util.PreferenceUtil
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -50,16 +49,12 @@ class OtherSettingsFragment : AbsSettingsFragment() {
         }
         val languagePreference: Preference? = findPreference(LANGUAGE_NAME)
         languagePreference?.setOnPreferenceChangeListener { prefs, newValue ->
-            val languageCode = newValue as? String ?: "auto"
+            val languageCode = AppLocaleManager.normalize(newValue as? String)
             PreferenceUtil.languageCode = languageCode
             setSummary(prefs, languageCode)
-            val locales = if (languageCode == "auto") {
-                LocaleListCompat.getEmptyLocaleList()
-            } else {
-                LocaleListCompat.forLanguageTags(languageCode)
+            if (!AppLocaleManager.syncFrameworkLocale(requireContext(), languageCode)) {
+                restartActivity()
             }
-            AppCompatDelegate.setApplicationLocales(locales)
-            restartActivity()
             true
         }
     }

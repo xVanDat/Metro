@@ -15,6 +15,7 @@
 package code.name.monkey.retromusic
 
 import android.app.Application
+import android.content.Context
 import androidx.preference.PreferenceManager
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import code.name.monkey.appthemehelper.ThemeStore
@@ -23,6 +24,7 @@ import code.name.monkey.retromusic.activities.ErrorActivity
 import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
 import code.name.monkey.retromusic.helper.WallpaperAccentManager
+import code.name.monkey.retromusic.util.AppLocaleManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -30,9 +32,14 @@ class App : Application() {
 
     private val wallpaperAccentManager = WallpaperAccentManager(this)
 
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(AppLocaleManager.wrap(base))
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
+        AppLocaleManager.syncFrameworkLocale(this)
 
         startKoin {
             androidContext(this@App)

@@ -15,20 +15,16 @@
 package code.name.monkey.retromusic.activities.base
 
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
-import androidx.core.os.LocaleListCompat
-import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.common.ATHToolbarActivity
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.LANGUAGE_NAME
 import code.name.monkey.retromusic.extensions.*
+import code.name.monkey.retromusic.util.AppLocaleManager
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.CustomFontManager
 import code.name.monkey.retromusic.util.FontApplier
@@ -41,7 +37,6 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
     private var fontApplier: FontApplier? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        updateLocale()
         updateTheme()
         hideStatusBar()
         super.onCreate(savedInstanceState)
@@ -64,27 +59,6 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
         if (PreferenceUtil.isCustomFont && !CustomFontManager.hasCustomFont(this)) {
             setTheme(R.style.FontThemeOverlay)
         }
-    }
-
-    private fun updateLocale() {
-        val localeCode = PreferenceUtil.languageCode
-            .takeIf { it == "auto" || it.substringBefore('-') in SUPPORTED_LANGUAGES }
-            ?: "auto"
-        if (PreferenceUtil.languageCode != localeCode) {
-            PreferenceUtil.languageCode = localeCode
-        }
-
-        val targetLocales = if (localeCode == "auto") {
-            LocaleListCompat.getEmptyLocaleList()
-        } else {
-            LocaleListCompat.forLanguageTags(localeCode)
-        }
-        if (AppCompatDelegate.getApplicationLocales().toLanguageTags() !=
-            targetLocales.toLanguageTags()
-        ) {
-            AppCompatDelegate.setApplicationLocales(targetLocales)
-        }
-        PreferenceUtil.isLocaleAutoStorageEnabled = true
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -127,23 +101,6 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
             super.attachBaseContext(null)
             return
         }
-        val languageCode = PreferenceManager.getDefaultSharedPreferences(newBase)
-            .getString(LANGUAGE_NAME, "auto")
-            ?.substringBefore('-')
-        val localizedContext = if (languageCode in SUPPORTED_LANGUAGES) {
-            val locale = java.util.Locale.forLanguageTag(languageCode!!)
-            val configuration = Configuration(newBase.resources.configuration).apply {
-                setLocale(locale)
-                setLayoutDirection(locale)
-            }
-            newBase.createConfigurationContext(configuration)
-        } else {
-            newBase
-        }
-        super.attachBaseContext(localizedContext)
-    }
-
-    companion object {
-        private val SUPPORTED_LANGUAGES = setOf("en", "vi")
+        super.attachBaseContext(AppLocaleManager.wrap(newBase))
     }
 }
