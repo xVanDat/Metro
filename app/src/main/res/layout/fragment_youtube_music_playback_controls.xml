@@ -94,14 +94,17 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/playPauseButton"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
+        android:scaleType="center"
         app:backgroundTint="@android:color/white"
+        app:fabCustomSize="72dp"
         app:layout_constraintEnd_toStartOf="@id/nextButton"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/previousButton"
         app:layout_constraintTop_toBottomOf="@id/songCurrentProgress"
+        app:maxImageSize="30dp"
         app:srcCompat="@drawable/ic_play_arrow" />
 
     <androidx.appcompat.widget.AppCompatImageButton

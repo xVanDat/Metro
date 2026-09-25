@@ -4,36 +4,41 @@
  */
 package code.name.monkey.retromusic.fragments.player.streaming
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.SHOW_LYRICS
 import code.name.monkey.retromusic.fragments.base.goToLyrics
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
-import code.name.monkey.retromusic.util.MusicUtil
+import code.name.monkey.retromusic.model.lyrics.AbsSynchronizedLyrics
+import code.name.monkey.retromusic.model.lyrics.Lyrics
+import code.name.monkey.retromusic.util.LyricUtil
+import code.name.monkey.retromusic.util.PreferenceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jaudiotagger.audio.exceptions.CannotReadException
+import java.io.FileNotFoundException
 
 class SpotifyPlayerFragment : StreamingPlayerFragment(
     R.layout.fragment_spotify_player,
     gradientBackground = true,
-), MusicProgressViewUpdateHelper.Callback {
-
-    private data class LyricLine(val timeMs: Long?, val text: String)
+    supportsSyncedLyrics = true,
+), MusicProgressViewUpdateHelper.Callback, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var progressHelper: MusicProgressViewUpdateHelper
     private var lyricsPreview: TextView? = null
-    private var lyricLines: List<LyricLine> = emptyList()
-    private var displayedLine = -1
-    private var lyricsSongId = -1L
+    private var lyrics: Lyrics? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        progressHelper = MusicProgressViewUpdateHelper(this, 300, 600)
+        progressHelper = MusicProgressViewUpdateHelper(this, 500, 1000)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,64 +46,93 @@ class SpotifyPlayerFragment : StreamingPlayerFragment(
         lyricsPreview = view.findViewById<TextView>(R.id.lyricsPreview).apply {
             setOnClickListener { goToLyrics(requireActivity()) }
         }
-        loadLyrics()
+        updateLyrics()
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        loadLyrics()
+        updateLyrics()
     }
 
     override fun onPlayingMetaChanged() {
         super.onPlayingMetaChanged()
-        loadLyrics()
+        updateLyrics()
     }
 
     override fun onResume() {
         super.onResume()
-        progressHelper.start()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .registerOnSharedPreferenceChangeListener(this)
+        if (PreferenceUtil.showLyrics) {
+            progressHelper.start()
+            updateLyrics()
+        } else {
+            hideLyrics()
+        }
     }
 
     override fun onPause() {
         progressHelper.stop()
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .unregisterOnSharedPreferenceChangeListener(this)
         super.onPause()
     }
 
     override fun onDestroyView() {
         lyricsPreview = null
-        lyricLines = emptyList()
+        lyrics = null
         super.onDestroyView()
     }
 
     override fun onUpdateProgressViews(progress: Int, total: Int) {
-        if (lyricLines.isEmpty()) return
-        val timed = lyricLines.firstOrNull()?.timeMs != null
-        val index = if (timed) {
-            lyricLines.indexOfLast { (it.timeMs ?: Long.MAX_VALUE) <= progress }.coerceAtLeast(0)
-        } else {
-            if (total <= 0) 0 else ((progress.toFloat() / total) * lyricLines.size)
-                .toInt().coerceIn(0, lyricLines.lastIndex)
+        val synchronizedLyrics = lyrics as? AbsSynchronizedLyrics
+        if (!PreferenceUtil.showLyrics || synchronizedLyrics?.isValid != true) {
+            hideLyrics()
+            return
         }
-        if (index != displayedLine) {
-            displayedLine = index
-            lyricsPreview?.text = lyricLines[index].text
+
+        val line = synchronizedLyrics.getLine(progress).trim()
+        lyricsPreview?.apply {
+            isVisible = line.isNotEmpty()
+            if (text.toString() != line) text = line
         }
     }
 
-    private fun loadLyrics() {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key != SHOW_LYRICS) return
+        if (PreferenceUtil.showLyrics) {
+            progressHelper.start()
+            updateLyrics()
+        } else {
+            progressHelper.stop()
+            lyrics = null
+            hideLyrics()
+        }
+    }
+
+    private fun updateLyrics() {
         val song = MusicPlayerRemote.currentSong
-        if (song.id < 0 || song.id == lyricsSongId) return
-        lyricsSongId = song.id
-        displayedLine = -1
-        lyricsPreview?.isVisible = false
-        lifecycleScope.launch {
-            val parsed = withContext(Dispatchers.IO) {
-                parseLyrics(MusicUtil.getLyrics(song))
+        lyrics = null
+        hideLyrics()
+        if (song.id < 0 || !PreferenceUtil.showLyrics) return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val parsed = try {
+                val lrcFile = LyricUtil.getSyncedLyricsFile(song)
+                val data = LyricUtil.getStringFromLrc(lrcFile)
+                Lyrics.parse(
+                    song,
+                    data.ifEmpty { LyricUtil.getEmbeddedSyncedLyrics(song.data) },
+                )
+            } catch (error: FileNotFoundException) {
+                null
+            } catch (error: CannotReadException) {
+                null
             }
-            if (!isAdded || MusicPlayerRemote.currentSong.id != song.id) return@launch
-            lyricLines = parsed
-            lyricsPreview?.isVisible = parsed.isNotEmpty()
-            if (parsed.isNotEmpty()) {
+
+            withContext(Dispatchers.Main) {
+                if (!isAdded || MusicPlayerRemote.currentSong.id != song.id) return@withContext
+                lyrics = parsed
                 onUpdateProgressViews(
                     MusicPlayerRemote.songProgressMillis,
                     MusicPlayerRemote.songDurationMillis,
@@ -107,30 +141,15 @@ class SpotifyPlayerFragment : StreamingPlayerFragment(
         }
     }
 
-    private fun parseLyrics(rawLyrics: String?): List<LyricLine> {
-        val raw = rawLyrics?.trim().orEmpty()
-        if (raw.isBlank() || raw.equals("No lyrics found", ignoreCase = true)) return emptyList()
-
-        val timestamp = Regex("""\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?]\s*(.*)""")
-        val timedLines = raw.lineSequence().mapNotNull { line ->
-            val match = timestamp.find(line) ?: return@mapNotNull null
-            val text = match.groupValues[4].trim()
-            if (text.isEmpty()) return@mapNotNull null
-            val minutes = match.groupValues[1].toLong()
-            val seconds = match.groupValues[2].toLong()
-            val fraction = match.groupValues[3].padEnd(3, '0').take(3).toLongOrNull() ?: 0L
-            LyricLine((minutes * 60_000L) + (seconds * 1_000L) + fraction, text)
-        }.sortedBy { it.timeMs }.toList()
-        if (timedLines.isNotEmpty()) return timedLines
-
-        return raw.lineSequence()
-            .map(String::trim)
-            .filter { it.isNotEmpty() && !it.matches(Regex("""\[[a-zA-Z]+:.*]""")) }
-            .map { LyricLine(null, it) }
-            .toList()
+    private fun hideLyrics() {
+        lyricsPreview?.apply {
+            isVisible = false
+            text = null
+        }
     }
 }
 
 class SpotifyPlaybackControlsFragment : StreamingPlaybackControlsFragment(
     R.layout.fragment_spotify_playback_controls,
+    forceLightControls = true,
 )

@@ -31,7 +31,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class StreamingPlaybackControlsFragment(@LayoutRes layout: Int) :
+abstract class StreamingPlaybackControlsFragment(
+    @LayoutRes layout: Int,
+    private val forceLightControls: Boolean = false,
+) :
     AbsPlayerControlsFragment(layout) {
 
     private lateinit var titleView: TextView
@@ -141,21 +144,27 @@ abstract class StreamingPlaybackControlsFragment(@LayoutRes layout: Int) :
     override fun onShuffleModeChanged() = updateShuffleState()
 
     override fun setColor(color: MediaNotificationProcessor) {
-        primaryColor = color.primaryTextColor
-        lastPlaybackControlsColor = color.primaryTextColor
-        lastDisabledPlaybackControlsColor = ColorUtil.withAlpha(color.primaryTextColor, 0.35f)
+        val resolvedPrimary = if (forceLightControls) Color.WHITE else color.primaryTextColor
+        val resolvedSecondary = if (forceLightControls) {
+            ColorUtil.withAlpha(Color.WHITE, 0.68f)
+        } else {
+            color.secondaryTextColor
+        }
+        primaryColor = resolvedPrimary
+        lastPlaybackControlsColor = resolvedPrimary
+        lastDisabledPlaybackControlsColor = ColorUtil.withAlpha(resolvedPrimary, 0.35f)
 
-        titleView.setTextColor(color.primaryTextColor)
-        artistView.setTextColor(color.secondaryTextColor)
-        currentTimeView.setTextColor(color.secondaryTextColor)
-        totalTimeView.setTextColor(color.secondaryTextColor)
-        progressSlider.applyColor(color.primaryTextColor)
+        titleView.setTextColor(resolvedPrimary)
+        artistView.setTextColor(resolvedSecondary)
+        currentTimeView.setTextColor(resolvedSecondary)
+        totalTimeView.setTextColor(resolvedSecondary)
+        progressSlider.applyColor(resolvedPrimary)
 
         TintHelper.setTintAuto(playPauseView, Color.BLACK, false)
         TintHelper.setTintAuto(playPauseView, Color.WHITE, true)
-        favoriteView?.setColorFilter(color.primaryTextColor)
-        tintAction(queueAction, color.primaryTextColor)
-        tintAction(lyricsAction, color.primaryTextColor)
+        favoriteView?.setColorFilter(resolvedPrimary)
+        tintAction(queueAction, resolvedPrimary)
+        tintAction(lyricsAction, resolvedPrimary)
         updatePrevNextColor()
         updateRepeatState()
         updateShuffleState()

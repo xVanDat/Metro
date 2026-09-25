@@ -20,11 +20,13 @@ import code.name.monkey.retromusic.fragments.base.AbsPlayerFragment
 import code.name.monkey.retromusic.fragments.player.PlayerAlbumCoverFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 
 abstract class StreamingPlayerFragment(
     @LayoutRes layout: Int,
     private val gradientBackground: Boolean,
+    private val supportsSyncedLyrics: Boolean = false,
 ) : AbsPlayerFragment(layout) {
 
     private var lastColor = Color.BLACK
@@ -50,7 +52,10 @@ abstract class StreamingPlayerFragment(
     private fun setUpToolbar() {
         toolbar?.apply {
             inflateMenu(R.menu.menu_player)
-            menu.findItem(R.id.action_toggle_lyrics)?.isVisible = false
+            menu.findItem(R.id.action_toggle_lyrics)?.apply {
+                isVisible = supportsSyncedLyrics
+                isChecked = PreferenceUtil.showLyrics
+            }
             menu.findItem(R.id.now_playing)?.isVisible = false
             for (index in 0 until menu.size()) {
                 menu.getItem(index).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
@@ -68,9 +73,9 @@ abstract class StreamingPlayerFragment(
             GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
                 intArrayOf(
-                    color.backgroundColor,
-                    ColorUtils.blendARGB(color.backgroundColor, Color.BLACK, 0.48f),
-                    ColorUtils.blendARGB(color.backgroundColor, Color.BLACK, 0.82f),
+                    ColorUtils.blendARGB(color.backgroundColor, Color.BLACK, 0.35f),
+                    ColorUtils.blendARGB(color.backgroundColor, Color.BLACK, 0.68f),
+                    ColorUtils.blendARGB(color.backgroundColor, Color.BLACK, 0.92f),
                 ),
             )
         } else {
@@ -79,7 +84,7 @@ abstract class StreamingPlayerFragment(
         toolbar?.let {
             ToolbarContentTintHelper.colorizeToolbar(
                 it,
-                color.primaryTextColor,
+                controlsFragment.primaryColor,
                 requireActivity(),
             )
         }
