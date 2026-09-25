@@ -51,6 +51,7 @@ import code.name.monkey.retromusic.util.PreferenceUtil.userName
 import com.bumptech.glide.Glide
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
+import java.util.Calendar
 
 class HomeFragment :
     AbsMainActivityFragment(R.layout.fragment_home), IScrollHelper {
@@ -66,6 +67,7 @@ class HomeFragment :
         mainActivity.supportActionBar?.title = null
         setupListeners()
         binding.titleWelcome.text = String.format("%s", userName)
+        updateGreeting()
 
         enterTransition = MaterialFadeThrough().addTarget(binding.contentContainer)
         reenterTransition = MaterialFadeThrough().addTarget(binding.contentContainer)
@@ -306,9 +308,19 @@ class HomeFragment :
 
     override fun onResume() {
         super.onResume()
+        updateGreeting()
         checkForMargins()
         libraryViewModel.forceReload(ReloadType.HomeSections)
         exitTransition = null
+    }
+
+    private fun updateGreeting() {
+        val greeting = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 5..11 -> R.string.good_morning
+            in 12..17 -> R.string.good_afternoon
+            else -> R.string.good_evening
+        }
+        binding.greeting.setText(greeting)
     }
 
     override fun onDestroyView() {

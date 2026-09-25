@@ -15,7 +15,10 @@
 package code.name.monkey.retromusic.dialogs
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.colorButtons
@@ -25,18 +28,38 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class ImportPlaylistDialog : DialogFragment() {
     private val libraryViewModel by activityViewModel<LibraryViewModel>()
+    private val playlistFilePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@registerForActivityResult
+        runCatching {
+            requireContext().contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }
+        libraryViewModel.importPlaylistFile(requireContext(), uri)
+        dismiss()
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return materialDialog(R.string.import_playlist)
-            .setMessage(R.string.import_playlist_message)
-            .setPositiveButton(R.string.import_label) { _, _ ->
-                try {
-                    libraryViewModel.importPlaylists()
-                } catch (e: Exception) {
-                    e.printStackTrace()
+            .setMessage(R.string.import_playlist_source_message)
+            .setPositiveButton(R.string.choose_playlist_file, null)
+            .setNeutralButton(R.string.import_from_media_store, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+            .apply {
+                setOnShowListener {
+                    colorButtons()
+                    getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        // Playlist MIME types vary widely between file managers.
+                        // Showing every file keeps M3U, PLS, XSPF, WPL and ASX selectable.
+                        playlistFilePicker.launch(arrayOf("*/*"))
+                    }
+                    getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                        libraryViewModel.importPlaylists()
+                        dismiss()
+                    }
                 }
             }
-            .create()
-            .colorButtons()
     }
 }

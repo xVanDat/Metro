@@ -16,9 +16,23 @@ fun Uri.toLocalStorageFile(context: Context): File? {
 
     val documentId = runCatching { DocumentsContract.getTreeDocumentId(this) }.getOrNull()
         ?: return null
-    val separator = documentId.indexOf(':')
-    val volumeId = if (separator >= 0) documentId.substring(0, separator) else documentId
-    val relativePath = if (separator >= 0) documentId.substring(separator + 1) else ""
+    return documentId.toLocalStorageFile(context)
+}
+
+/** Converts a single file URI returned by ExternalStorageProvider into a local path. */
+fun Uri.toLocalStorageDocumentFile(context: Context): File? {
+    if (authority != EXTERNAL_STORAGE_DOCUMENTS_AUTHORITY ||
+        !DocumentsContract.isDocumentUri(context, this)
+    ) return null
+    val documentId = runCatching { DocumentsContract.getDocumentId(this) }.getOrNull()
+        ?: return null
+    return documentId.toLocalStorageFile(context)
+}
+
+private fun String.toLocalStorageFile(context: Context): File? {
+    val separator = indexOf(':')
+    val volumeId = if (separator >= 0) substring(0, separator) else this
+    val relativePath = if (separator >= 0) substring(separator + 1) else ""
     val volumeRoot = findVolumeRoot(context, volumeId) ?: return null
     val canonicalRoot = runCatching { volumeRoot.canonicalFile }.getOrNull() ?: return null
     val selectedFolder = runCatching {

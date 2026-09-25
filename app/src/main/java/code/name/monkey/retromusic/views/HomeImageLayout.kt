@@ -47,4 +47,11 @@ class HomeImageLayout @JvmOverloads constructor(
         } else {
             userImageBinding!!.titleWelcome
         }
+
+    val greeting: TextView
+        get() = if (PreferenceUtil.isHomeBanner) {
+            bannerImageBinding!!.text
+        } else {
+            userImageBinding!!.text
+        }
 }

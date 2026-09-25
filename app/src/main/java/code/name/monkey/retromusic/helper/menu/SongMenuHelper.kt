@@ -32,10 +32,12 @@ import code.name.monkey.retromusic.dialogs.DeleteSongsDialog
 import code.name.monkey.retromusic.dialogs.SongDetailDialog
 import code.name.monkey.retromusic.fragments.LibraryViewModel
 import code.name.monkey.retromusic.fragments.ReloadType
+import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IPaletteColorHolder
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.BlacklistStore
+import code.name.monkey.retromusic.providers.HiddenSongsStore
 import code.name.monkey.retromusic.repository.RealRepository
 import code.name.monkey.retromusic.util.MusicUtil
 import code.name.monkey.retromusic.util.RingtoneManager
@@ -125,6 +127,14 @@ object SongMenuHelper : KoinComponent {
             R.id.action_add_to_blacklist -> {
                 BlacklistStore.getInstance(activity).addPath(File(song.data))
                 libraryViewModel.forceReload(ReloadType.Songs)
+                return true
+            }
+            R.id.action_hide_song -> {
+                if (HiddenSongsStore.getInstance(activity).hide(song)) {
+                    MusicPlayerRemote.removeFromQueue(song)
+                    libraryViewModel.reloadLibraryContent()
+                    activity.showToast(R.string.song_hidden)
+                }
                 return true
             }
         }

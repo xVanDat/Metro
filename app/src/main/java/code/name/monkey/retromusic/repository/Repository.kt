@@ -22,6 +22,7 @@ import code.name.monkey.retromusic.db.*
 import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.model.*
 import code.name.monkey.retromusic.model.smartplaylist.NotPlayedPlaylist
+import code.name.monkey.retromusic.providers.HiddenSongsStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -155,11 +156,11 @@ class RealRepository(
         searchRepository.searchAll(context, query, filter)
 
     override suspend fun getPlaylistSongs(playlist: Playlist): List<Song> =
-        if (playlist is AbsCustomPlaylist) {
+        (if (playlist is AbsCustomPlaylist) {
             playlist.songs()
         } else {
             PlaylistSongsLoader.getPlaylistSongList(context, playlist.id)
-        }
+        }).filterNotHidden()
 
     override suspend fun getGenre(genreId: Long): List<Song> = genreRepository.songs(genreId)
 
@@ -185,17 +186,27 @@ class RealRepository(
         playlistRepository.playlist(playlistId)
 
     override suspend fun fetchPlaylistWithSongs(): List<PlaylistWithSongs> =
-        roomRepository.playlistWithSongs()
+        roomRepository.playlistWithSongs().map { playlist ->
+            val hiddenIds = hiddenSongIds()
+            playlist.copy(songs = playlist.songs.filterNot { it.id in hiddenIds })
+        }
 
-    override fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs> = roomRepository.getPlaylist(playlistId)
+    override fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs> =
+        roomRepository.getPlaylist(playlistId).map { playlist ->
+            val hiddenIds = hiddenSongIds()
+            playlist.copy(songs = playlist.songs.filterNot { it.id in hiddenIds })
+        }
 
     override suspend fun playlistSongs(playlistWithSongs: PlaylistWithSongs): List<Song> =
         playlistWithSongs.songs.map {
             it.toSong()
-        }
+        }.filterNotHidden()
 
     override fun playlistSongs(playListId: Long): LiveData<List<SongEntity>> =
-        roomRepository.getSongs(playListId)
+        roomRepository.getSongs(playListId).map { songs ->
+            val hiddenIds = hiddenSongIds()
+            songs.filterNot { it.id in hiddenIds }
+        }
 
     override suspend fun insertSongs(songs: List<SongEntity>) =
         roomRepository.insertSongs(songs)
@@ -240,6 +251,7 @@ class RealRepository(
 
     override suspend fun favoritePlaylistSongs(): List<SongEntity> =
         roomRepository.favoritePlaylistSongs(context.getString(R.string.favorites))
+            .filterNot { it.id in hiddenSongIds() }
 
     override suspend fun recentSongs(): List<Song> = lastAddedRepository.recentSongs()
 
@@ -265,18 +277,21 @@ class RealRepository(
         roomRepository.findSongExistInPlayCount(songId)
 
     override suspend fun playCountSongs(): List<PlayCountEntity> =
-        roomRepository.playCountSongs()
+        roomRepository.playCountSongs().filterNot { it.id in hiddenSongIds() }
 
     override fun observableHistorySongs(): LiveData<List<Song>> =
         roomRepository.observableHistorySongs().map {
-            it.fromHistoryToSongs()
+            it.fromHistoryToSongs().filterNotHidden()
         }
 
     override fun historySong(): List<HistoryEntity> =
-        roomRepository.historySongs()
+        roomRepository.historySongs().filterNot { it.id in hiddenSongIds() }
 
     override fun favorites(): LiveData<List<SongEntity>> =
-        roomRepository.favoritePlaylistLiveData(context.getString(R.string.favorites))
+        roomRepository.favoritePlaylistLiveData(context.getString(R.string.favorites)).map { songs ->
+            val hiddenIds = hiddenSongIds()
+            songs.filterNot { it.id in hiddenIds }
+        }
 
     override suspend fun suggestions(): List<Song> {
         return NotPlayedPlaylist().songs().shuffled().takeIf {
@@ -319,6 +334,13 @@ class RealRepository(
             it.toSong()
         }
         return Home(songs, FAVOURITES, R.string.favorites)
+    }
+
+    private fun hiddenSongIds() = HiddenSongsStore.getInstance(context).songIds
+
+    private fun List<Song>.filterNotHidden(): List<Song> {
+        val hiddenIds = hiddenSongIds()
+        return filterNot { it.id in hiddenIds }
     }
 
 }

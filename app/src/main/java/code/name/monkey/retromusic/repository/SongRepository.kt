@@ -31,6 +31,7 @@ import code.name.monkey.retromusic.extensions.getStringOrNull
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.BlacklistStore
+import code.name.monkey.retromusic.providers.HiddenSongsStore
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.getExternalStoragePublicDirectory
 import java.text.Collator
@@ -63,9 +64,11 @@ class RealSongRepository(private val context: Context) : SongRepository {
 
     override fun songs(cursor: Cursor?): List<Song> {
         val songs = arrayListOf<Song>()
+        val hiddenSongIds = HiddenSongsStore.getInstance(context).songIds
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                songs.add(getSongFromCursorImpl(cursor))
+                val song = getSongFromCursorImpl(cursor)
+                if (song.id !in hiddenSongIds) songs.add(song)
             } while (cursor.moveToNext())
         }
         cursor?.close()

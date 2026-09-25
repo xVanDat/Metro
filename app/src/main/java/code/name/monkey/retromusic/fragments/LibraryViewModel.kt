@@ -16,6 +16,7 @@ package code.name.monkey.retromusic.fragments
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.net.Uri
 import androidx.core.animation.doOnEnd
 import androidx.lifecycle.*
 import code.name.monkey.retromusic.RECENT_ALBUMS
@@ -33,6 +34,7 @@ import code.name.monkey.retromusic.model.*
 import code.name.monkey.retromusic.repository.RealRepository
 import code.name.monkey.retromusic.util.DensityUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.PlaylistFileImporter
 import code.name.monkey.retromusic.util.logD
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -61,6 +63,8 @@ class LibraryViewModel(
     init {
         loadLibraryContent()
     }
+
+    fun reloadLibraryContent() = loadLibraryContent()
 
     private fun loadLibraryContent() = viewModelScope.launch(IO) {
         fetchHomeSections()
@@ -241,6 +245,38 @@ class LibraryViewModel(
                 }
             }
             forceReload(Playlists)
+        }
+    }
+
+    fun importPlaylistFile(context: Context, uri: Uri) = viewModelScope.launch(IO) {
+        runCatching {
+            val result = PlaylistFileImporter.parse(context, uri, repository.allSongs())
+            when {
+                result.entryCount == 0 -> withContext(Main) {
+                    context.showToast(R.string.playlist_import_no_entries)
+                }
+                result.songs.isEmpty() -> withContext(Main) {
+                    context.showToast(R.string.playlist_import_no_matches)
+                }
+                else -> {
+                    val existing = checkPlaylistExists(result.name).firstOrNull()
+                    val playlistId = existing?.playListId
+                        ?: createPlaylist(PlaylistEntity(playlistName = result.name))
+                    insertSongs(result.songs.map { it.toSongEntity(playlistId) })
+                    fetchPlaylists()
+                    withContext(Main) {
+                        context.showToast(
+                            context.getString(
+                                R.string.playlist_imported,
+                                result.songs.size,
+                                result.name
+                            )
+                        )
+                    }
+                }
+            }
+        }.onFailure {
+            withContext(Main) { context.showToast(R.string.playlist_import_failed) }
         }
     }
 
