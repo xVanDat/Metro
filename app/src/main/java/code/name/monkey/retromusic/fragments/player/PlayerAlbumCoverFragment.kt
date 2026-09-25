@@ -286,7 +286,7 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
         )
 
         when (PreferenceUtil.nowPlayingScreen) {
-            Flat, Normal, Material -> if (PreferenceUtil.isAdaptiveColor) {
+            Flat, Normal, AnimatedGradient, Material -> if (PreferenceUtil.isAdaptiveColor) {
                 setLRCViewColors(color.primaryTextColor, color.secondaryTextColor)
             } else {
                 setLRCViewColors(primaryColor, secondaryColor)
@@ -313,5 +313,5 @@ class PlayerAlbumCoverFragment : AbsMusicServiceFragment(R.layout.fragment_playe
     }
 
     private val lyricViewNpsList =
-        listOf(Blur, Classic, Color, Flat, Material, MD3, Normal, Plain, Simple)
+        listOf(AnimatedGradient, Blur, Classic, Color, Flat, Material, MD3, Normal, Plain, Simple)
 }

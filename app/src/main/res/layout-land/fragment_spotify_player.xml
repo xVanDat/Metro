@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/bg_spotify_lyrics_preview"
+        android:background="@android:color/transparent"
         android:ellipsize="end"
         android:maxLines="2"
         android:padding="12dp"
