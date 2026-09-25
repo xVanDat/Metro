@@ -15,6 +15,7 @@
 package code.name.monkey.retromusic.activities.base
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,9 +23,11 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.os.LocaleListCompat
+import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.common.ATHToolbarActivity
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.LANGUAGE_NAME
 import code.name.monkey.retromusic.extensions.*
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.CustomFontManager
@@ -120,7 +123,24 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(newBase)
+        if (newBase == null) {
+            super.attachBaseContext(null)
+            return
+        }
+        val languageCode = PreferenceManager.getDefaultSharedPreferences(newBase)
+            .getString(LANGUAGE_NAME, "auto")
+            ?.substringBefore('-')
+        val localizedContext = if (languageCode in SUPPORTED_LANGUAGES) {
+            val locale = java.util.Locale.forLanguageTag(languageCode!!)
+            val configuration = Configuration(newBase.resources.configuration).apply {
+                setLocale(locale)
+                setLayoutDirection(locale)
+            }
+            newBase.createConfigurationContext(configuration)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(localizedContext)
     }
 
     companion object {

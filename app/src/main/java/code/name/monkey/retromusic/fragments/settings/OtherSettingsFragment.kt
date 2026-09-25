@@ -59,6 +59,7 @@ class OtherSettingsFragment : AbsSettingsFragment() {
                 LocaleListCompat.forLanguageTags(languageCode)
             }
             AppCompatDelegate.setApplicationLocales(locales)
+            restartActivity()
             true
         }
     }
