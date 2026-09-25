@@ -71,20 +71,17 @@ abstract class AbsThemeActivity : ATHToolbarActivity(), Runnable {
             PreferenceUtil.languageCode = localeCode
         }
 
-        val currentLanguage = AppCompatDelegate.getApplicationLocales()
-            .get(0)?.language
-        if (currentLanguage != null && currentLanguage !in SUPPORTED_LANGUAGES) {
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+        val targetLocales = if (localeCode == "auto") {
+            LocaleListCompat.getEmptyLocaleList()
+        } else {
+            LocaleListCompat.forLanguageTags(localeCode)
         }
-        if (PreferenceUtil.isLocaleAutoStorageEnabled) {
-            val locales = if (localeCode == "auto") {
-                LocaleListCompat.getEmptyLocaleList()
-            } else {
-                LocaleListCompat.forLanguageTags(localeCode)
-            }
-            AppCompatDelegate.setApplicationLocales(locales)
-            PreferenceUtil.isLocaleAutoStorageEnabled = true
+        if (AppCompatDelegate.getApplicationLocales().toLanguageTags() !=
+            targetLocales.toLanguageTags()
+        ) {
+            AppCompatDelegate.setApplicationLocales(targetLocales)
         }
+        PreferenceUtil.isLocaleAutoStorageEnabled = true
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
