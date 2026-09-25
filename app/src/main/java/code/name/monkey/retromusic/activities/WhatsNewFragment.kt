@@ -12,6 +12,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.os.ConfigurationCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentActivity
 import code.name.monkey.appthemehelper.util.ATHUtil.isWindowBackgroundDark
@@ -45,7 +46,14 @@ class WhatsNewFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         try {
             val buf = StringBuilder()
-            val stream = requireContext().assets.open("retro-changelog.html")
+            val language = ConfigurationCompat.getLocales(resources.configuration)
+                .get(0)?.language
+            val changelogAsset = if (language == "vi") {
+                "retro-changelog-vi.html"
+            } else {
+                "retro-changelog.html"
+            }
+            val stream = requireContext().assets.open(changelogAsset)
             stream.reader(StandardCharsets.UTF_8).buffered().use { br ->
                 var str: String?
                 while (br.readLine().also { str = it } != null) {
@@ -97,17 +105,17 @@ class WhatsNewFragment : BottomSheetDialogFragment() {
             )
         }
         setChangelogRead(requireContext())
-        binding.tgFab.setOnClickListener {
-            openUrl(Constants.TELEGRAM_CHANGE_LOG)
+        binding.releasesFab.setOnClickListener {
+            openUrl(Constants.RELEASES)
         }
-        binding.tgFab.accentColor()
-        binding.tgFab.shrink()
+        binding.releasesFab.accentColor()
+        binding.releasesFab.shrink()
         binding.container.setOnScrollChangeListener { _: NestedScrollView?, _: Int, scrollY: Int, _: Int, oldScrollY: Int ->
             val dy = scrollY - oldScrollY
             if (dy > 0) {
-                binding.tgFab.shrink()
+                binding.releasesFab.shrink()
             } else if (dy < 0) {
-                binding.tgFab.extend()
+                binding.releasesFab.extend()
             }
         }
     }

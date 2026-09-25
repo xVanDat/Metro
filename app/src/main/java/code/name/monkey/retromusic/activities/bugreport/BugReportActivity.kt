@@ -23,6 +23,7 @@ import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import code.name.monkey.appthemehelper.util.TintHelper
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
+import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.base.AbsThemeActivity
 import code.name.monkey.retromusic.activities.bugreport.model.DeviceInfo
@@ -65,7 +66,7 @@ open class BugReportActivity : AbsThemeActivity() {
     private fun reportIssue() {
         copyDeviceInfoToClipBoard()
         val i = Intent(Intent.ACTION_VIEW)
-        i.data = ISSUE_TRACKER_LINK.toUri()
+        i.data = Constants.GITHUB_ISSUES.toUri()
         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(i)
     }
@@ -82,10 +83,5 @@ open class BugReportActivity : AbsThemeActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        private const val ISSUE_TRACKER_LINK =
-            "https://github.com/MuntashirAkon/Metro/issues/new"
     }
 }

@@ -115,8 +115,7 @@
     <string name="bug_report_no_title">Vui lòng nhập tiêu đề vấn đề</string>
     <string name="bug_report_no_username">Vui lòng nhập đúng tên người dùng Github của bạn</string>
     <string name="bug_report_success">Báo cáo lỗi thành công</string>
-    <string name="bug_report_summary">Đã xảy ra lỗi không mong muốn. Xin lỗi bạn vì lỗi này, nếu nó
-tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
+    <string name="bug_report_summary">Mở trang báo lỗi GitHub của bản fork này và đính kèm thông tin thiết bị đã sao chép</string>
     <string name="bug_report_use_account">Gửi bằng tài khoản GitHub </string>
     <string name="buy_now">Mua ngay</string>
     <string name="cancel_current_timer">Hủy</string>
@@ -188,7 +187,6 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="error_load_failed">Không thể tải</string>
     <string name="error_share_file">Không thể chia sẽ tập tin</string>
     <string name="expanded">Mở rộng</string>
-    <string name="faq">Câu hỏi thường gặp</string>
     <string name="favorites">Yêu thích</string>
     <string name="file_already_exists">Tập tin đã tồn tại</string>
     <string name="finish_last_song">Kết thúc bài cuối</string>
@@ -204,7 +202,7 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="general_settings_title">Giao diện và màu sắc</string>
     <string name="genre">Thể loại</string>
     <string name="genres">Thể loại</string>
-    <string name="git_hub_summary">Tham gia phát triển dự án trên Github</string>
+    <string name="git_hub_summary">Xem mã nguồn của bản fork này trên GitHub</string>
     <string name="gradient">Chuyển sắc</string>
     <string name="grant_access">Trao quyền truy cập</string>
     <string name="grid_size_1">1</string>
@@ -216,7 +214,6 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="grid_size_7">7</string>
     <string name="grid_size_8">8</string>
     <string name="grid_style_label">Bố trí lưới</string>
-    <string name="help_summary">Bạn cần hỗ trợ thêm?</string>
     <string name="hinge">Bản lề</string>
     <string name="history">Lịch sử</string>
     <string name="history_cleared">Đã xóa lịch sử</string>
@@ -549,8 +546,6 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="top_artists">Nghệ sĩ hàng đầu</string>
     <string name="track_hint">"Rãnh (2 cho bài số 2 hoặc 3004 cho CD3 bài số 4)"</string>
     <string name="track_list">Số rãnh</string>
-    <string name="translate">Dịch</string>
-    <string name="translate_community">Hãy giúp chúng tôi dịch ứng dụng sang ngôn ngữ của bạn nhé</string>
     <string name="try_retro_music_premium">Thử Retro Music Premium</string>
     <string name="twitter_page">Twitter</string>
     <string name="twitter_page_summary">Chia sẻ thiết kế của bạn với Retro Music</string>
@@ -564,7 +559,7 @@ tiếp tục xảy ra hãy \"Xóa dữ liệu ứng dụng\"</string>
     <string name="username">Tên người dùng</string>
     <string name="version">Phiên bản</string>
     <string name="vertical_flip">Lật dọc</string>
-    <string name="view_on_telegram">Xem trên Telegram</string>
+    <string name="view_releases">Xem các bản phát hành</string>
     <string name="volume">Âm lượng</string>
     <string name="web_search">Tìm kiếm trên web</string>
     <string name="website">Trang web</string>

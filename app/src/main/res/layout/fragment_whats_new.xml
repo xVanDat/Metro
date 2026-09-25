@@ -22,11 +22,11 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/tgFab"
+        android:id="@+id/releasesFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="@string/view_on_telegram"
-        app:icon="@drawable/ic_telegram_white" />
+        android:text="@string/view_releases"
+        app:icon="@drawable/ic_github_circle" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

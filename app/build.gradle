@@ -23,8 +23,8 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         applicationId 'io.github.xvandat.metro'
-        versionCode 10700
-        versionName '6.2.0-xvandat.1'
+        versionCode 260926
+        versionName '26.09.26'
 
         multiDexEnabled true
     }

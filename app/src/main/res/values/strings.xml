@@ -119,7 +119,7 @@
     <string name="bug_report_no_title">Please enter an issue title</string>
     <string name="bug_report_no_username">Please enter your valid GitHub username</string>
     <string name="bug_report_success">Bug report successful</string>
-    <string name="bug_report_summary">An unexpected error occurred. Sorry you found this bug, if it keeps crashing \"Clear app data\" or send an Email </string>
+    <string name="bug_report_summary">Open this fork\'s GitHub issue tracker and include the copied device information</string>
     <string name="bug_report_use_account">Send using GitHub account</string>
     <string name="buy_now">Buy now</string>
     <string name="cancel_current_timer">Cancel</string>
@@ -191,7 +191,6 @@
     <string name="error_load_failed">Load failed</string>
     <string name="error_share_file">Couldn\'t share file</string>
     <string name="expanded">Expanded</string>
-    <string name="faq">FAQ</string>
     <string name="favorites">Favorites</string>
     <string name="file_already_exists">File already exists</string>
     <string name="finish_last_song">Finish last song</string>
@@ -207,7 +206,7 @@
     <string name="general_settings_title">Appearance and colors</string>
     <string name="genre">Genre</string>
     <string name="genres">Genres</string>
-    <string name="git_hub_summary">Fork the project on GitHub</string>
+    <string name="git_hub_summary">View this fork\'s source code on GitHub</string>
     <string name="gradient">Gradient</string>
     <string name="grant_access">Grant access</string>
     <string name="grid_size_1">1</string>
@@ -219,7 +218,6 @@
     <string name="grid_size_7">7</string>
     <string name="grid_size_8">8</string>
     <string name="grid_style_label">Grid style</string>
-    <string name="help_summary">Need more help?</string>
     <string name="hinge">Hinge</string>
     <string name="history">History</string>
     <string name="history_cleared">History cleared</string>
@@ -554,8 +552,6 @@
     <string name="top_artists">Top artists</string>
     <string name="track_hint">"Track (2 for track 2 or 3004 for CD3 track 4)"</string>
     <string name="track_list">Track number</string>
-    <string name="translate">Translate</string>
-    <string name="translate_community">Help us translate the app to your language</string>
     <string name="try_retro_music_premium">Try Retro Music Premium</string>
     <string name="twitter_page">Twitter</string>
     <string name="twitter_page_summary">Share your design with Retro Music</string>
@@ -569,7 +565,7 @@
     <string name="username">Username</string>
     <string name="version">Version</string>
     <string name="vertical_flip">Vertical flip</string>
-    <string name="view_on_telegram">View on Telegram</string>
+    <string name="view_releases">View releases</string>
     <string name="volume">Volume</string>
     <string name="web_search">Web search</string>
     <string name="website">Website</string>
